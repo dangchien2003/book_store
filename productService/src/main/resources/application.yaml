@@ -1,0 +1,21 @@
+server:
+  port: 8083
+  servlet:
+    context-path: "/product/v1"
+
+spring:
+  application:
+    name: bookService
+  datasource:
+    url: jdbc:mysql://localhost:3306/product
+    username: TASC
+    password: chienkoi123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
