@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthorResponse {
-    int id;
+public class PublisherResponse {
+    long id;
     String name;
     String website;
 }
