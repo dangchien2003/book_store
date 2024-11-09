@@ -27,6 +27,12 @@ public enum ErrorCode {
 
     INVALID_PAGE_NUMBER(1030, "Invalid page number", HttpStatus.BAD_REQUEST),
 
+    NOT_FOUND_STATUS_CODE(3001, "Status code not found", HttpStatus.NOT_FOUND),
+
+    AUTHOR_NOT_FOUND(3010, "Author not found", HttpStatus.NOT_FOUND),
+
+    PUBLISHER_NOT_FOUND(3020, "Publisher not found", HttpStatus.NOT_FOUND),
+
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

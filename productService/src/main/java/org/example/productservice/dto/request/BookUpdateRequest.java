@@ -12,9 +12,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookCreationRequest {
+public class BookUpdateRequest {
     @NotBlank(message = "DATA_BLANK")
     String name;
+
+    @NotBlank(message = "DATA_BLANK")
+    String statusCode;
 
     @Min(value = 1, message = "Reprint edition must be greater than 1")
     int reprintEdition;
@@ -36,7 +39,7 @@ public class BookCreationRequest {
     int availableQuantity;
 
     BookSize size;
-    String statusCode;
+
     Integer publisherId;
     Long authorId;
     String description;

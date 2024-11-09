@@ -3,11 +3,11 @@ package org.example.productservice.repository.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.response.PublisherResponse;
 import org.example.productservice.entity.Publisher;
 import org.example.productservice.repository.PublisherRepository;
 import org.example.productservice.utils.MapperUtils;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -19,6 +19,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class PublisherRepositoryImpl implements PublisherRepository {
     JdbcTemplate jdbcTemplate;
 
@@ -36,7 +37,8 @@ public class PublisherRepositoryImpl implements PublisherRepository {
                 ps.setLong(3, publisher.getCreatedAt());
                 return ps;
             }, keyHolder);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
+            log.error("Publisher repository error: ", e);
             return null;
         }
 

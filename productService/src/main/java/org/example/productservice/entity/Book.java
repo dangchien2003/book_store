@@ -2,11 +2,11 @@ package org.example.productservice.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.example.productservice.dto.request.BookSize;
 import org.example.productservice.exception.AppException;
 import org.example.productservice.exception.ErrorCode;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -15,6 +15,7 @@ import java.util.StringJoiner;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Slf4j
 public class Book extends EntityWithTimestamps {
     Long id;
     String name;
@@ -22,8 +23,8 @@ public class Book extends EntityWithTimestamps {
     int price;
     int costPrice;
     int discount;
-    int publisherId;
-    long authorId;
+    Integer publisherId;
+    Long authorId;
     int pageCount;
     String size;
     int availableQuantity;
@@ -35,20 +36,20 @@ public class Book extends EntityWithTimestamps {
     static String sizeSeparator = "x";
     static String[] sizeOrder = {"width", "wide", "height"};
 
-    public void setSize(int width, int wide, int height) {
+    public void setSize(BookSize bookSize) {
 
-        if (width == 0 || wide == 0 || height == 0)
+        if (bookSize.getWidth() == 0 || bookSize.getWide() == 0 || bookSize.getHeight() == 0)
             throw new AppException(ErrorCode.INVALID_DATA);
 
         StringJoiner joiner = new StringJoiner(sizeSeparator);
         int count = 0;
         for (String key : sizeOrder) {
             if (key.equals("width"))
-                joiner.add(String.valueOf(width));
+                joiner.add(String.valueOf(bookSize.getWidth()));
             else if (key.equals("wide"))
-                joiner.add(String.valueOf(wide));
+                joiner.add(String.valueOf(bookSize.getWide()));
             else if (key.equals("height"))
-                joiner.add(String.valueOf(height));
+                joiner.add(String.valueOf(bookSize.getHeight()));
             else
                 throw new AppException(ErrorCode.INVALID_DATA);
             count++;
@@ -59,17 +60,30 @@ public class Book extends EntityWithTimestamps {
         this.size = joiner.toString();
     }
 
-    public Map<String, Integer> getSize() {
+    public BookSize getBookSize() {
         if (Objects.isNull(this.size))
-            return new HashMap<>();
+            return new BookSize();
 
         String[] splitSize = this.size.split(sizeSeparator);
+        BookSize bookSize = new BookSize();
 
-        Map<String, Integer> result = new HashMap<>();
-        result.put(sizeOrder[0], Integer.parseInt(splitSize[0]));
-        result.put(sizeOrder[1], Integer.valueOf(splitSize[1]));
-        result.put(sizeOrder[2], Integer.valueOf(splitSize[2]));
+        try {
+            for (int i = 0; i < splitSize.length; i++) {
+                int value = Integer.parseInt(splitSize[i]);
+                if (sizeOrder[i].equals("width"))
+                    bookSize.setWide(value);
+                else if (sizeOrder[i].equals("wide"))
+                    bookSize.setWide(value);
+                else if (sizeOrder[i].equals("height"))
+                    bookSize.setHeight(value);
+                else
+                    log.warn("Unknown key");
+            }
+        } catch (NumberFormatException e) {
+            log.error("Book Error:", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
 
-        return result;
+        return bookSize;
     }
 }

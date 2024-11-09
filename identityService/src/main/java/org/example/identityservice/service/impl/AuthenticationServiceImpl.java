@@ -98,7 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!verified
                 || !expiryTime.after(new Date())
                 || tokenRepository
-                .existsByTokenIdAndReject(signedJWT.getJWTClaimsSet().getJWTID(), TokenStatus.REJECT)
+                .existsByTokenIdAndReject(signedJWT.getJWTClaimsSet().getJWTID(), TokenStatus.REJECT) // check in black list
         ) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
