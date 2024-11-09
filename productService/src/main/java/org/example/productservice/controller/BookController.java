@@ -27,6 +27,7 @@ public class BookController {
     }
 
     @GetMapping("find")
+//    @PreAuthorize("hasAnyAuthority('ROLE_WAREHOUSE_MANAGER')")
     ApiResponse<List<ManagerFindBookResponse>> find(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "category", required = false) Integer category,

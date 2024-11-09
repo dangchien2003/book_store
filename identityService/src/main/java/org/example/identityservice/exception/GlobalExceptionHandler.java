@@ -6,6 +6,7 @@ import org.example.identityservice.utils.ENumUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,20 +36,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     ResponseEntity<ApiResponse<Object>> handlingHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        ErrorCode errorCode = ErrorCode.BODY_PARSE_FAIL;
-        return setResponse(errorCode);
+        return setResponse(ErrorCode.BODY_PARSE_FAIL);
     }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     ResponseEntity<ApiResponse<Object>> handlingHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        ErrorCode errorCode = ErrorCode.NOTFOUND_ENDPOINT;
-        return setResponse(errorCode);
+        return setResponse(ErrorCode.NOTFOUND_ENDPOINT);
     }
 
     @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
     ResponseEntity<ApiResponse<Object>> handlingMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        ErrorCode errorCode = ErrorCode.INVALID_DATA;
-        return setResponse(errorCode);
+        return setResponse(ErrorCode.INVALID_DATA);
     }
 
     @ExceptionHandler(value = HandlerMethodValidationException.class)
@@ -71,17 +69,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = NoResourceFoundException.class)
     ResponseEntity<ApiResponse<Object>> handlingNoResourceFoundException(NoResourceFoundException e) {
-        ErrorCode errorCode = ErrorCode.NOTFOUND_ENDPOINT;
-        return setResponse(errorCode);
+        return setResponse(ErrorCode.NOTFOUND_ENDPOINT);
     }
 
-    //
-//    @ExceptionHandler(value = AuthorizationDeniedException.class)
-//    ResponseEntity<ApiResponse<Object>> handlingAuthorizationDeniedException(AuthorizationDeniedException e) {
-//        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
-//        return setResponse(errorCode);
-//    }
-//
+
+    @ExceptionHandler(value = AuthorizationDeniedException.class)
+    ResponseEntity<ApiResponse<Object>> handlingAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return setResponse(ErrorCode.NO_ACCESS);
+    }
+
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<Object>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String firstErrorMessage = e.getBindingResult().getFieldErrors().stream()
