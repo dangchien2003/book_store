@@ -6,11 +6,11 @@ import lombok.experimental.FieldDefaults;
 import org.example.productservice.dto.request.BookCreationRequest;
 import org.example.productservice.dto.response.ApiResponse;
 import org.example.productservice.dto.response.BookCreationResponse;
+import org.example.productservice.dto.response.ManagerFindBookResponse;
 import org.example.productservice.service.BookService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +23,20 @@ public class BookController {
     ApiResponse<BookCreationResponse> createBook(@RequestBody BookCreationRequest request) {
         return ApiResponse.<BookCreationResponse>builder()
                 .result(bookService.create(request))
+                .build();
+    }
+
+    @GetMapping("find")
+    ApiResponse<List<ManagerFindBookResponse>> find(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "category", required = false) Integer category,
+            @RequestParam(value = "publisher", required = false) Integer publisher,
+            @RequestParam(value = "author", required = false) Long author,
+            @RequestParam(value = "page", defaultValue = "1") int pageNumber
+
+    ) {
+        return ApiResponse.<List<ManagerFindBookResponse>>builder()
+                .result(bookService.find(name, category, publisher, author, pageNumber))
                 .build();
     }
 }

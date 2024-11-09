@@ -35,10 +35,17 @@ public class MapperUtils {
 
         for (int i = 1; i < words.length; i++) {
             String word = words[i];
-            result.append(word.substring(0, 1).toUpperCase()).append(word.substring(1));
+            result.append(capitalize(word));
         }
 
         return result.toString();
+    }
+
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     public static <T> T mappingOneElement(Class<T> clazz, Map<String, Object> data) throws Exception {
@@ -49,40 +56,72 @@ public class MapperUtils {
     public static <T> T mappingOneElement(Class<T> clazz, Map<String, Object> data, Map<String, String> dictionary)
             throws Exception {
 
-        if (data.isEmpty())
+        if (data.isEmpty()) {
             return null;
+        }
 
         T instance = clazz.getDeclaredConstructor().newInstance();
+        Class<?> superclass = clazz.getSuperclass();
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
 
-            try {
-                Field field = clazz.getDeclaredField(dictionary.get(fieldName));
-                field.setAccessible(true);
+//            if (Objects.isNull(fieldValue)) {
+//                continue;
+//            }
 
-                Class<?> fieldType = field.getType();
-                if (fieldType == String.class) {
-                    field.set(instance, fieldValue.toString());
-                } else if (fieldType == int.class || fieldType == Integer.class) {
-                    field.set(instance, Integer.parseInt(fieldValue.toString()));
-                } else if (fieldType == double.class || fieldType == Double.class) {
-                    field.set(instance, Double.parseDouble(fieldValue.toString()));
-                } else if (fieldType == float.class || fieldType == Float.class) {
-                    field.set(instance, Float.parseFloat(fieldValue.toString()));
-                } else if (fieldType == boolean.class || fieldType == Boolean.class) {
-                    field.set(instance, Boolean.parseBoolean(fieldValue.toString()));
-                } else if (fieldType == long.class || fieldType == Long.class) {
-                    field.set(instance, Long.parseLong(fieldValue.toString()));
-                } else {
-                    field.set(instance, fieldValue);
+            try {
+                Field field = findField(clazz, superclass, dictionary.get(fieldName));
+                if (field != null) {
+                    field.setAccessible(true);
+                    setFieldValue(instance, field, fieldValue);
+//                    String setterName = "set" + capitalize(dictionary.get(fieldName));
+//                    Method setterMethod = clazz.getMethod(setterName, field.getType());
+//                    setterMethod.invoke(instance, fieldValue);
                 }
             } catch (NoSuchFieldException e) {
                 log.warn("No such field: " + fieldName);
+            } catch (NullPointerException e) {
+                log.warn("Field: " + fieldName + " is null");
+            } catch (Exception e) {
+                log.error("Mapper utils error: ", e);
             }
         }
+
         return instance;
+    }
+
+    private static Field findField(Class<?> clazz, Class<?> superclass, String fieldName) throws NoSuchFieldException {
+        Field field = null;
+        try {
+            field = clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            if (superclass != null) {
+                field = superclass.getDeclaredField(fieldName);
+            }
+        }
+        return field;
+    }
+
+    private static <T> void setFieldValue(T instance, Field field, Object fieldValue) throws IllegalAccessException {
+        Class<?> fieldType = field.getType();
+
+        if (fieldType == String.class) {
+            field.set(instance, fieldValue.toString());
+        } else if (fieldType == int.class || fieldType == Integer.class) {
+            field.set(instance, Integer.parseInt(fieldValue.toString()));
+        } else if (fieldType == double.class || fieldType == Double.class) {
+            field.set(instance, Double.parseDouble(fieldValue.toString()));
+        } else if (fieldType == float.class || fieldType == Float.class) {
+            field.set(instance, Float.parseFloat(fieldValue.toString()));
+        } else if (fieldType == boolean.class || fieldType == Boolean.class) {
+            field.set(instance, Boolean.parseBoolean(fieldValue.toString()));
+        } else if (fieldType == long.class || fieldType == Long.class) {
+            field.set(instance, Long.parseLong(fieldValue.toString()));
+        } else {
+            field.set(instance, fieldValue);
+        }
     }
 
     public static <T> List<T> mappingManyElement(Class<T> clazz, List<Map<String, Object>> data)
@@ -97,23 +136,6 @@ public class MapperUtils {
         for (Map<String, Object> element : data) {
             result.add(mappingOneElement(clazz, element, dictionary));
         }
-
-//        int threadPool = 2;
-//
-//        if (data.size() > 10) {
-//            ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-//
-//            int elementOneThread = data.size() / threadPool;
-//            for (int i = 0; i < threadPool; i++) {
-//
-//            }
-//
-//        } else {
-//            for (Map<String, Object> element : data) {
-//                result.add(mappingOneElement(clazz, element));
-//            }
-//        }
-
 
         return result;
     }
