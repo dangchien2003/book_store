@@ -6,7 +6,6 @@ import org.example.apigateway.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 @ControllerAdvice
 @Slf4j
@@ -24,11 +23,11 @@ public class GlobalExceptionHandler {
         return setResponse(errorCode);
     }
 
-    @ExceptionHandler(value = NoResourceFoundException.class)
-    ResponseEntity<ApiResponse<Object>> handlingNoResourceFoundException(NoResourceFoundException e) {
-        ErrorCode errorCode = ErrorCode.NOTFOUND_URL;
-        return setResponse(errorCode);
-    }
+//    @ExceptionHandler(value = NoResourceFoundException.class)
+//    ResponseEntity<ApiResponse<Object>> handlingNoResourceFoundException(NoResourceFoundException e) {
+//        ErrorCode errorCode = ErrorCode.NOTFOUND_URL;
+//        return setResponse(errorCode);
+//    }
 
 
     ResponseEntity<ApiResponse<Object>> setResponse(ErrorCode errorCode) {

@@ -12,7 +12,9 @@ import java.text.ParseException;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomJwtDecoder implements JwtDecoder {
+public class
+
+CustomJwtDecoder implements JwtDecoder {
 
     @Override
     public Jwt decode(String token) throws JwtException {

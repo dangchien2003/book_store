@@ -8,12 +8,21 @@ spring:
   application.name: api-gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
       routes:
-        - id: identity_service
-          uri: http://localhost:8081
+        - id: identity-service
+          uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
-            - StripPrefix=2
-            - RewritePath=/identity/(?<remaining>.*), /identity/v1/${remaining}
+            - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    enabled: true
+  instance:
+    prefer-ip-address: true

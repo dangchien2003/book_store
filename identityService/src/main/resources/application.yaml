@@ -1,7 +1,7 @@
 server:
   port: 8081
   servlet:
-    context-path: /identity/v1
+    context-path: /identity
 
 spring:
   security:
@@ -16,8 +16,9 @@ spring:
           google:
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
   application:
-    name: identityService
+    name: identity-service
   datasource:
     url: ${DBMS_CONNECTION}
     username: ${DBMS_USERNAME}
@@ -40,3 +41,10 @@ token:
   time-live-access-token: 1
   time-live-refresh-token: 10
   secret-key: ${SECRET_KEY}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
