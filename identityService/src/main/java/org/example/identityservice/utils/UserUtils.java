@@ -70,18 +70,18 @@ public class UserUtils {
                 .accessToken(genAccessToken(user, timeLiveAccessToken, secretKey))
                 .refreshToken(genRefreshToken(userAgent, timeLiveRefreshToken, secretKey))
                 .expire(timeLiveAccessToken * 60)
-                .actor(identifyActor(user))
+                .manager(identifyManager(user))
                 .build();
     }
 
-    static String identifyActor(User user) {
-        
-        String actor = null;
+    static boolean identifyManager(User user) {
+
+        boolean isManager = false;
 
         if (!Objects.isNull(user.getRole()))
-            actor = user.getRole().isManager() ? "Manager" : "Customer";
+            isManager = user.getRole().isManager();
 
-        return actor;
+        return isManager;
     }
 
     public static String buildScope(User user) {

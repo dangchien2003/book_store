@@ -15,5 +15,5 @@ public class AuthenticationResponse {
     String refreshToken;
     String name;
     int expire;
-    String actor;
+    boolean manager;
 }
