@@ -8,7 +8,8 @@ const Logo = ({ isAdmin }) => {
       <img src={logoSvg} alt='logo' style={{ width: '70px', verticalAlign: 'middle' }} />
       <Box sx={{ position: 'relative' }}>
         <Typography variant='span' sx={{ fontSize: 35, fontFamily: '"Norican", cursive', lineHeight: '70px' }}>Book Store</Typography>
-        <Typography sx={{ position: 'absolute', left: '50px', bottom: '-3px' }}>Quản trị viên</Typography></Box>
+        {isAdmin && <Typography sx={{ position: 'absolute', left: '50px', bottom: '-3px' }}>Quản trị viên</Typography>}
+      </Box>
     </Box>
   )
 }
