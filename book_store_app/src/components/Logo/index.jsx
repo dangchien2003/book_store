@@ -2,11 +2,13 @@ import Box from '@mui/material/Box'
 import logoSvg from '@/assets/image/logo.svg'
 import Typography from '@mui/material/Typography'
 
-const Logo = () => {
+const Logo = ({ isAdmin }) => {
   return (
     <Box sx={{ display: 'flex', justifyItems: 'center' }}>
       <img src={logoSvg} alt='logo' style={{ width: '70px', verticalAlign: 'middle' }} />
-      <Typography variant='span' sx={{ fontSize: 35, fontFamily: '"Norican", cursive', lineHeight: '70px' }}>Book Store</Typography>
+      <Box sx={{ position: 'relative' }}>
+        <Typography variant='span' sx={{ fontSize: 35, fontFamily: '"Norican", cursive', lineHeight: '70px' }}>Book Store</Typography>
+        <Typography sx={{ position: 'absolute', left: '50px', bottom: '-3px' }}>Quản trị viên</Typography></Box>
     </Box>
   )
 }

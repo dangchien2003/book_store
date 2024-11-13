@@ -80,7 +80,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public List<AuthorResponse> getAll(int pageNumber) {
-        int pageSize = 2;
+        int pageSize = 10;
         try {
             return authorRepository.findAllOrderByName(pageNumber, pageSize);
         } catch (Exception e) {

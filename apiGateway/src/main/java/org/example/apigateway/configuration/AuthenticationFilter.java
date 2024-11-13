@@ -44,6 +44,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/auth/google/verify",
             "/identity/users/sign-up",
             "/identity/users/register/google",
+
+            "/product/.*"
     };
 
     @Override

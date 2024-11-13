@@ -91,11 +91,11 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<ManagerFindBookResponse> find(String name, Integer category, Integer publisher, Long author, int numberPage) {
 
-        if (Objects.isNull(name)
+      /*  if (Objects.isNull(name)
                 && Objects.isNull(category)
                 && Objects.isNull(publisher)
                 && Objects.isNull(author))
-            throw new AppException(ErrorCode.FILTER_EMPTY);
+            throw new AppException(ErrorCode.FILTER_EMPTY);*/
 
         List<Long> filterInBookIds = null;
         if (!Objects.isNull(category)) {

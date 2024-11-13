@@ -1,8 +1,15 @@
-export const API_BASE_URL = 'http://localhost:8081/identity/v1'
+export const API_BASE_URL = 'http://localhost:8080/gateway/v1'
 
 export const API_IDENTITY_SERVICE = {
-  googleAuth: '/auth/google/verify',
-  normalAuth: '/auth/sign-in',
-  registerGoogle: '/user/register/google',
-  register: '/user/sign-up'
+  googleAuth: '/identity/auth/google/verify',
+  normalAuth: '/identity/auth/sign-in',
+  registerGoogle: '/identity/user/register/google',
+  register: '/identity/user/sign-up'
+}
+
+export const API_PRODUCT_SERVICE = {
+  getAllAuthor: '/product/author/all',
+  getAllCategory: '/product/category/all',
+  getAllPublisher: '/product/publisher/all',
+  getAllBook: '/product/book/find'
 }

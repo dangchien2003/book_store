@@ -29,7 +29,6 @@ const SignInForm = () => {
 
   const handleClickLogin = () => {
     normalAuthentication(username, password).then((response) => {
-
       setAccessToken(response.data.result.accessToken, response.data.result.expire)
       setRefeshToken(response.data.result.refreshToken)
 
@@ -38,12 +37,12 @@ const SignInForm = () => {
       else
         deleteRememberUsername()
 
-      if (response.data.result.actor === 'ADMIN')
+      if (response.data.result.manager)
         navigate('/manager')
       else
         navigate('/')
     }).catch((error) => {
-      toastError(messageError[error.response.data.code] ?? error.response.data.message)
+      toastError(error.response.data ? messageError[error.response.data.code] : error.response.data.message)
     })
   }
 

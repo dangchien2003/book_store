@@ -18,6 +18,12 @@ spring:
             - Path=${app.api-prefix}/identity/**
           filters:
             - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=${app.api-prefix}/product/**
+          filters:
+            - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
 
 eureka:
   client:
