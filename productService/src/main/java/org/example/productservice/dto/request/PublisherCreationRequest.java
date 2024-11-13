@@ -1,6 +1,6 @@
 package org.example.productservice.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublisherCreationRequest {
-    @NotNull(message = "INVALID_NAME")
+    @NotBlank(message = "INVALID_NAME")
     String name;
     String website;
 }

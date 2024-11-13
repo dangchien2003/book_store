@@ -1,6 +1,7 @@
 package org.example.productservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,10 +11,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class PublisherUpdateRequest {
-    @NotBlank(message = "NOTFOUND_ID")
+public class CategoryUpdateRequest {
+    @NotNull(message = "DATA_BLANK")
     Integer id;
-    @NotBlank(message = "INVALID_NAME")
+
+    @NotBlank(message = "DATA_BLANK")
     String name;
-    String website;
 }

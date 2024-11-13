@@ -10,10 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class PublisherUpdateRequest {
-    @NotBlank(message = "NOTFOUND_ID")
-    Integer id;
+public class CategoryCreationRequest {
     @NotBlank(message = "INVALID_NAME")
     String name;
-    String website;
 }

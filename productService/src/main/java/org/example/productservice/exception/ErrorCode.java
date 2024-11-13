@@ -21,6 +21,7 @@ public enum ErrorCode {
     NOTFOUND_DATA(1008, "Not found data", HttpStatus.NOT_FOUND),
     UPDATE_FAIL(1009, "Data update error", HttpStatus.BAD_REQUEST),
     FILTER_EMPTY(1010, "Not found data filter", HttpStatus.BAD_REQUEST),
+    DATA_EXIST(1011, "Duplicate data", HttpStatus.BAD_REQUEST),
 
     UNAUTHENTICATED(1041, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     NO_ACCESS(1042, "This account does not have access", HttpStatus.FORBIDDEN),
