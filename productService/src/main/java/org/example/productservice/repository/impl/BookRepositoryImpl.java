@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
+import org.example.productservice.dto.response.BaseBookResponse;
 import org.example.productservice.dto.response.ManagerFindBookResponse;
 import org.example.productservice.entity.Book;
 import org.example.productservice.repository.BookRepository;
@@ -115,5 +116,23 @@ public class BookRepositoryImpl implements BookRepository {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 
         return namedParameterJdbcTemplate.queryForObject(sql, parameters, Integer.class);
+    }
+
+    @Override
+    public List<BaseBookResponse> getAllBookInCategory(int id, int page, int pageSize) throws Exception {
+        String sql = """
+                    WITH bookIds AS (
+                        SELECT bc.book_id 
+                        FROM book_category bc 
+                        WHERE bc.category_id = ? 
+                        LIMIT ?, ?
+                    )
+                    SELECT b.id, b.name, b.main_image 
+                    FROM book b 
+                    JOIN bookIds bi ON b.id = bi.book_id
+                """;
+
+        return MapperUtils.mappingManyElement(BaseBookResponse.class,
+                jdbcTemplate.queryForList(sql, id, (page - 1) * pageSize, pageSize));
     }
 }

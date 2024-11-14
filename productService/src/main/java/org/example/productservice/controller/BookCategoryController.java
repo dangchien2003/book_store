@@ -1,12 +1,14 @@
 package org.example.productservice.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.productservice.dto.request.CategoryAddBookRequest;
 import org.example.productservice.dto.request.RemoveBookInCategoryRequest;
 import org.example.productservice.dto.response.ApiResponse;
+import org.example.productservice.dto.response.DetailCategoryResponse;
 import org.example.productservice.service.BookCategoryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,14 @@ public class BookCategoryController {
                 .build();
     }
 
+    @GetMapping("detail")
+    ApiResponse<DetailCategoryResponse> getDetail(@Valid @Min(value = 1, message = "INVALID_PAGE_NUMBER")
+                                                  @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+                                                  @RequestParam("id") int id) {
+        return ApiResponse.<DetailCategoryResponse>builder()
+                .result(bookCategoryService.detail(id, page))
+                .build();
+    }
 //    @DeleteMapping("delete-book")
 //    ApiResponse<List<CategoryResponse>> find(@RequestParam("name") String name,
 //                                             @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
@@ -39,6 +49,7 @@ public class BookCategoryController {
 //                .result(categoryService.find(name, page))
 //                .build();
 //    }
+
 //
 //    @GetMapping("info")
 //    ApiResponse<List<CategoryResponse>> find1(@RequestParam("id") int id,

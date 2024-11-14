@@ -54,4 +54,6 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
 
         return namedParameterJdbcTemplate.update(sql, parameters);
     }
+
+
 }

@@ -73,4 +73,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         return namedParameterJdbcTemplate.queryForObject(sql, parameters, Integer.class);
     }
+
+    @Override
+    public Category findById(int id) throws Exception {
+        String sql = "SELECT c.id, c.name, c.create_at, c.modified_at FROM category c WHERE id = ?";
+        return MapperUtils.mappingOneElement(Category.class, jdbcTemplate.queryForMap(sql, id));
+    }
 }
