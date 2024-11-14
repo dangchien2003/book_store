@@ -9,12 +9,15 @@ import org.example.productservice.entity.Category;
 import org.example.productservice.repository.CategoryRepository;
 import org.example.productservice.utils.MapperUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -57,5 +60,17 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         return MapperUtils.mappingManyElement(CategoryResponse.class,
                 jdbcTemplate.queryForList(sql, "%" + name + "%", (pageNumber - 1) * pageSize, pageSize));
+    }
+
+    @Override
+    public int countExistInIds(Set<Integer> ids) {
+        String sql = "SELECT COUNT(*) as count FROM category WHERE id IN (:ids)";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", ids);
+
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+
+        return namedParameterJdbcTemplate.queryForObject(sql, parameters, Integer.class);
     }
 }

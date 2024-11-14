@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.response.ApiResponse;
 import org.example.productservice.utils.ENumUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -76,6 +77,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     ResponseEntity<ApiResponse<Object>> handlingAuthorizationDeniedException(AuthorizationDeniedException e) {
         return setResponse(ErrorCode.NO_ACCESS);
+    }
+
+    @ExceptionHandler(value = DataAccessException.class)
+    ResponseEntity<ApiResponse<Object>> handlingAuthorizationDeniedException(DataAccessException e) {
+        log.error(e.getMessage());
+        return setResponse(ErrorCode.DATA_EXIST);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

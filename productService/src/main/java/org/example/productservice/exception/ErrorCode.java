@@ -35,6 +35,8 @@ public enum ErrorCode {
 
     PUBLISHER_NOT_FOUND(3020, "Publisher not found", HttpStatus.NOT_FOUND),
 
+    LIST_BOOK_EMPTY(3030, "Must have at least 1 book to add", HttpStatus.BAD_REQUEST),
+
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

@@ -10,6 +10,8 @@ import org.example.productservice.entity.Book;
 import org.example.productservice.repository.BookRepository;
 import org.example.productservice.utils.MapperUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -18,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -100,5 +103,17 @@ public class BookRepositoryImpl implements BookRepository {
                 ManagerFindBookResponse.class,
                 jdbcTemplate.queryForList(sql.toString(), params.toArray())
         );
+    }
+
+    @Override
+    public int countExistInIds(Set<Long> ids) {
+        String sql = "SELECT COUNT(*) as count FROM book WHERE id IN (:ids)";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", ids);
+
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+
+        return namedParameterJdbcTemplate.queryForObject(sql, parameters, Integer.class);
     }
 }
