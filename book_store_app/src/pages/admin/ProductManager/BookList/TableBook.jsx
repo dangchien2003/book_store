@@ -3,7 +3,8 @@ import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Ta
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getAllBook } from '@/services/productService/bookService'
-import { toastInfo } from '@/utils/toast'
+import { toastError, toastInfo } from '@/utils/toast'
+import { useNavigate } from 'react-router-dom'
 
 const statusTemplate = {
   'ON_SALE': {
@@ -36,6 +37,7 @@ const TableBook = () => {
   const [page, setPage] = useState(1)
   const filter = useSelector((state) => state.managerFilterBook.value)
   const finding = useSelector((state) => state.managerClickFindBook.value)
+  const navigate = useNavigate()
 
   useEffect(() => {
 
@@ -45,7 +47,7 @@ const TableBook = () => {
     }
 
     getBooks()
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
 
 
@@ -58,6 +60,7 @@ const TableBook = () => {
         setPage(1)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finding])
 
   const getBooks = () => {
@@ -65,9 +68,10 @@ const TableBook = () => {
       .then(response => {
         if (response.data.result.length > 0) {
           setRows(response.data.result)
-          return
+        } else if (page === 1) {
+          toastInfo('Không có dữ liệu');
         } else {
-          toastInfo('Không có dữ liệu')
+          toastInfo('Đã đến trang cuối');
         }
 
         if (!finding) {
@@ -76,7 +80,9 @@ const TableBook = () => {
           backPage = true
         }
       })
-      .catch(error => { })
+      .catch(() => {
+        toastError('Lỗi không mong muốn')
+      })
   }
 
   const handleChangePage = (event, newPage) => {
@@ -90,6 +96,10 @@ const TableBook = () => {
     if (newPage > 0) {
       setPage(newPage)
     }
+  }
+
+  const handleClickViewDetail = (id) => {
+    navigate('/manager/book/detail/' + id)
   }
 
   return (
@@ -118,7 +128,7 @@ const TableBook = () => {
                 <TableCell component="th" scope="row">
                   <img src={row.img} alt={row.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 </TableCell>
-                <TableCell sx={{ maxWidth: 200 }}>{row.name}</TableCell>
+                <TableCell sx={{ maxWidth: 200 }} onClick={() => { handleClickViewDetail(row.id) }}>{row.name}</TableCell>
                 <TableCell >{formatCurrency(row.price)}</TableCell>
                 <TableCell >{genValueDiscount(row.price, row.discount)}</TableCell>
                 <TableCell >{row.authorName}</TableCell>

@@ -12,7 +12,7 @@ const LayoutAdmin = () => {
       </Box>
       <Box display='flex'>
         <SidebarMenu />
-        <Box sx={{ border: '1px solid', padding: '10px', pt: '20px' }} flex={1}>
+        <Box sx={{ borderLeft: '1px solid black', borderTop: '1px solid black', padding: '10px', pt: '20px' }} flex={1}>
           <Outlet />
         </Box>
       </Box>

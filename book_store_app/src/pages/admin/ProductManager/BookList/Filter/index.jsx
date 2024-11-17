@@ -7,7 +7,7 @@ const Filter = () => {
 
   return (
     <Box key='filter' sx={{
-      width: '250px', minHeight: '300px', borderRadius: '10px', border: '2px solid #1a89a2', position: 'relative', mt: '10px', padding: '15px', backgroundColor: '', '& .MuiAutocomplete-root': {
+      width: '250px', minHeight: '300px', borderRadius: '10px', border: '2px solid #1a89a2', position: 'relative', mt: '10px', padding: '15px', '& .MuiAutocomplete-root': {
         marginTop: '20px'
       }
     }} >

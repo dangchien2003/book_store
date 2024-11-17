@@ -9,7 +9,7 @@ export const API_IDENTITY_SERVICE = {
 
 export const API_PRODUCT_SERVICE = {
   getAllAuthor: '/product/author/all',
-  getAllCategory: '/product/category/all',
+  getAllCategory: '/product/category/get',
   getAllPublisher: '/product/publisher/all',
   getAllBook: '/product/book/find'
 }

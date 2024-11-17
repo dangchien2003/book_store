@@ -4,6 +4,7 @@ import SignUp from './pages/SignUp'
 import LayoutAdmin from './components/Manager/layout'
 import AddBook from './pages/admin/ProductManager/AddBook'
 import BookList from './pages/admin/ProductManager/BookList'
+import BookDetail from './pages/admin/ProductManager/BookDetail'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path='/manager' element={<LayoutAdmin />}>
           <Route path='book' element={<BookList />} />
           <Route path='book/add' element={<AddBook />} />
+          <Route path='book/detail/:id' element={<BookDetail />} />
           {/* <Route path='account' element={<AccountManager />} /> */}
         </Route>
         <Route path='/*' element={<SignIn />} />

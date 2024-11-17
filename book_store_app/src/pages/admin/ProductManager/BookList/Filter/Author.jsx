@@ -2,11 +2,10 @@ import { getAuthorInPage } from '@/services/productService/authorService'
 import { toastError } from '@/utils/toast'
 import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { incrementByFilter } from '@/features/manager/filterBook/filterBookSlice'
 
 const Author = () => {
-  const filter = useSelector((state) => state.managerFilterBook.value)
   const dispatch = useDispatch()
   const [authors, setAuthor] = useState([])
   const [page, setPage] = useState(1)
@@ -18,7 +17,7 @@ const Author = () => {
           if (response.data.result.length === 0) {
             return
           }
-          setAuthor(authors.concat(response.data.result));
+          setAuthor(authors.concat(response.data.result))
           setPage(currentPage => currentPage + 1)
         })
         .catch(() => {
