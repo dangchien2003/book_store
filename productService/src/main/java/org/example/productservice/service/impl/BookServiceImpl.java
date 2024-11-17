@@ -131,6 +131,8 @@ public class BookServiceImpl implements BookService {
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
 
+        detail.setBookSize(Book.getBookSize(detail.getSize()));
+        detail.setSize(null);
         return detail;
     }
 }

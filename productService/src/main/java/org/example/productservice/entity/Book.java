@@ -61,17 +61,21 @@ public class Book extends EntityWithTimestamps {
     }
 
     public BookSize getBookSize() {
-        if (Objects.isNull(this.size))
+        return getBookSize(this.size);
+    }
+
+    public static BookSize getBookSize(String size) {
+        if (Objects.isNull(size))
             return new BookSize();
 
-        String[] splitSize = this.size.split(sizeSeparator);
+        String[] splitSize = size.split(sizeSeparator);
         BookSize bookSize = new BookSize();
 
         try {
             for (int i = 0; i < splitSize.length; i++) {
                 int value = Integer.parseInt(splitSize[i]);
                 if (sizeOrder[i].equals("width"))
-                    bookSize.setWide(value);
+                    bookSize.setWidth(value);
                 else if (sizeOrder[i].equals("wide"))
                     bookSize.setWide(value);
                 else if (sizeOrder[i].equals("height"))

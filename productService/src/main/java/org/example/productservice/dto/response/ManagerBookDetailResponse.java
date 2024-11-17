@@ -3,6 +3,7 @@ package org.example.productservice.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.example.productservice.dto.request.BookSize;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class ManagerBookDetailResponse extends BaseBookResponse {
     int availableQuantity;
     int pageCount;
     String size;
+    BookSize bookSize;
 }
 
 
