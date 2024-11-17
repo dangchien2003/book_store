@@ -11,6 +11,8 @@ public interface CategoryRepository {
 
     List<CategoryResponse> findByName(String name, int pageNumber, int pageSize) throws Exception;
 
+    List<CategoryResponse> findAll(int pageNumber, int pageSize) throws Exception;
+
     Category findById(int id) throws Exception;
 
     int update(Category category);

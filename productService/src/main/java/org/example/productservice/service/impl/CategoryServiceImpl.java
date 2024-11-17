@@ -55,6 +55,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryResponse> find(String name, int page) {
         try {
+            if (Objects.isNull(name))
+                return categoryRepository.findAll(page, PAGE_SIZE_FOR_MANAGER_FIND);
             return categoryRepository.findByName(name, page, PAGE_SIZE_FOR_MANAGER_FIND);
         } catch (Exception e) {
             log.error("Category repository error: ", e);

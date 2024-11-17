@@ -1,6 +1,7 @@
 package org.example.productservice.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,15 +29,16 @@ public class CategoryController {
                 .build();
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("update")
     ApiResponse<CategoryResponse> update(@Valid @RequestBody CategoryUpdateRequest request) {
         return ApiResponse.<CategoryResponse>builder()
                 .result(categoryService.update(request))
                 .build();
     }
 
-    @PutMapping("get")
-    ApiResponse<List<CategoryResponse>> find(@RequestParam("name") String name,
+    @GetMapping("get")
+    ApiResponse<List<CategoryResponse>> find(@RequestParam(name = "name", required = false) String name,
+                                             @Valid @Min(value = 1, message = "INVALID_PAGE_NUMBER")
                                              @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
         return ApiResponse.<List<CategoryResponse>>builder()
                 .result(categoryService.find(name, page))

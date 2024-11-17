@@ -9,17 +9,17 @@ import org.example.productservice.dto.request.BookCreationRequest;
 import org.example.productservice.dto.request.BookUpdateRequest;
 import org.example.productservice.dto.response.BookCreationResponse;
 import org.example.productservice.dto.response.BookUpdateResponse;
+import org.example.productservice.dto.response.ManagerBookDetailResponse;
 import org.example.productservice.dto.response.ManagerFindBookResponse;
 import org.example.productservice.entity.Book;
 import org.example.productservice.enums.BookStatus;
 import org.example.productservice.exception.AppException;
 import org.example.productservice.exception.ErrorCode;
 import org.example.productservice.mapper.BookMapper;
-import org.example.productservice.repository.AuthorRepository;
-import org.example.productservice.repository.BookRepository;
-import org.example.productservice.repository.PublisherRepository;
+import org.example.productservice.repository.*;
 import org.example.productservice.service.BookService;
 import org.example.productservice.utils.ENumUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +36,8 @@ public class BookServiceImpl implements BookService {
     BookRepository bookRepository;
     AuthorRepository authorRepository;
     PublisherRepository publisherRepository;
+    BookCategoryRepository bookCategoryRepository;
+    CategoryRepository categoryRepository;
     BookMapper bookMapper;
 
     static final int PAGE_SIZE_FOR_MANAGER_FIND = 2;
@@ -91,29 +93,25 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<ManagerFindBookResponse> find(String name, Integer category, Integer publisher, Long author, int numberPage) {
 
-      /*  if (Objects.isNull(name)
-                && Objects.isNull(category)
-                && Objects.isNull(publisher)
-                && Objects.isNull(author))
-            throw new AppException(ErrorCode.FILTER_EMPTY);*/
-
         List<Long> filterInBookIds = null;
-        if (!Objects.isNull(category)) {
-            filterInBookIds = getBookIdsByCategoryId(category);
-            if (filterInBookIds.isEmpty())
-                return new ArrayList<>();
-        }
 
-        FindBook filter = FindBook.builder()
-                .name(name)
-                .author(author)
-                .publisher(publisher)
-                .bookIds(filterInBookIds)
-                .numberPage(numberPage)
-                .pageSize(PAGE_SIZE_FOR_MANAGER_FIND)
-                .build();
 
         try {
+            if (!Objects.isNull(category)) {
+                filterInBookIds = bookCategoryRepository.getAllBookByCategory(category, numberPage, PAGE_SIZE_FOR_MANAGER_FIND);
+                if (filterInBookIds.isEmpty())
+                    return new ArrayList<>();
+            }
+
+            FindBook filter = FindBook.builder()
+                    .name(name)
+                    .author(author)
+                    .publisher(publisher)
+                    .bookIds(filterInBookIds)
+                    .numberPage(numberPage)
+                    .pageSize(PAGE_SIZE_FOR_MANAGER_FIND)
+                    .build();
+
             return bookRepository.find(filter);
         } catch (Exception e) {
             log.error("Book repository error: ", e);
@@ -121,7 +119,18 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    List<Long> getBookIdsByCategoryId(Integer categoryId) {
-        return List.of();
+    @Override
+    public ManagerBookDetailResponse mGetDetail(long bookId) {
+        ManagerBookDetailResponse detail;
+        try {
+            detail = bookRepository.getDetail(bookId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new AppException(ErrorCode.NOTFOUND_DATA);
+        } catch (Exception e) {
+            log.error("Book repository error: ", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
+        return detail;
     }
 }

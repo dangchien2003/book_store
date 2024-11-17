@@ -56,10 +56,6 @@ public class MapperUtils {
     public static <T> T mappingOneElement(Class<T> clazz, Map<String, Object> data, Map<String, String> dictionary)
             throws Exception {
 
-        if (data.isEmpty()) {
-            return null;
-        }
-
         T instance = clazz.getDeclaredConstructor().newInstance();
         Class<?> superclass = clazz.getSuperclass();
 

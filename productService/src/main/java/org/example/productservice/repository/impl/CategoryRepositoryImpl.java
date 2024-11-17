@@ -63,6 +63,14 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
+    public List<CategoryResponse> findAll(int pageNumber, int pageSize) throws Exception {
+        String sql = "SELECT c.id, c.name FROM category c LIMIT ?, ?";
+
+        return MapperUtils.mappingManyElement(CategoryResponse.class,
+                jdbcTemplate.queryForList(sql, (pageNumber - 1) * pageSize, pageSize));
+    }
+
+    @Override
     public int countExistInIds(Set<Integer> ids) {
         String sql = "SELECT COUNT(*) as count FROM category WHERE id IN (:ids)";
 

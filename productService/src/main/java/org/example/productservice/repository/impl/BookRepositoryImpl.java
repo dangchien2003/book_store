@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.response.BaseBookResponse;
+import org.example.productservice.dto.response.ManagerBookDetailResponse;
 import org.example.productservice.dto.response.ManagerFindBookResponse;
 import org.example.productservice.entity.Book;
 import org.example.productservice.repository.BookRepository;
@@ -96,9 +97,11 @@ public class BookRepositoryImpl implements BookRepository {
             params.add(filter.getAuthor());
         }
 
-        sql.append(" LIMIT ?, ?");
-        params.add((filter.getNumberPage() - 1) * filter.getPageSize());
-        params.add(filter.getPageSize());
+        if (filter.getBookIds() == null || filter.getBookIds().isEmpty()) {
+            sql.append(" LIMIT ?, ?");
+            params.add((filter.getNumberPage() - 1) * filter.getPageSize());
+            params.add(filter.getPageSize());
+        }
 
         return MapperUtils.mappingManyElement(
                 ManagerFindBookResponse.class,
@@ -134,5 +137,19 @@ public class BookRepositoryImpl implements BookRepository {
 
         return MapperUtils.mappingManyElement(BaseBookResponse.class,
                 jdbcTemplate.queryForList(sql, id, (page - 1) * pageSize, pageSize));
+    }
+
+    @Override
+    public ManagerBookDetailResponse getDetail(long bookId) throws Exception {
+        String sql = """
+                SELECT b.id, b.name, b.main_image, b.price, b.discount, b.author_id, b.publisher_id, b.reprint_edition,
+                b.other_image, b.status_code, b.available_quantity, b.page_count, b.size
+                FROM book b
+                WHERE b.id = ?
+                """;
+
+        return MapperUtils.mappingOneElement(ManagerBookDetailResponse.class,
+                jdbcTemplate.queryForMap(sql, bookId)
+        );
     }
 }

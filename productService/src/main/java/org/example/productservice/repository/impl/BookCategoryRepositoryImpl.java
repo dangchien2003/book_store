@@ -55,5 +55,10 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepository {
         return namedParameterJdbcTemplate.update(sql, parameters);
     }
 
+    @Override
+    public List<Long> getAllBookByCategory(int categoryId, int pageNumber, int pageSize) throws Exception {
+        String sql = "SELECT bc.book_id FROM book_category bc WHERE bc.category_id = ? ORDER BY bc.book_id  LIMIT ?, ?";
 
+        return jdbcTemplate.queryForList(sql, Long.class, categoryId, (pageNumber - 1) * pageSize, pageSize);
+    }
 }
