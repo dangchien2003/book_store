@@ -74,14 +74,12 @@ public class Book extends EntityWithTimestamps {
         try {
             for (int i = 0; i < splitSize.length; i++) {
                 int value = Integer.parseInt(splitSize[i]);
-                if (sizeOrder[i].equals("width"))
-                    bookSize.setWidth(value);
-                else if (sizeOrder[i].equals("wide"))
-                    bookSize.setWide(value);
-                else if (sizeOrder[i].equals("height"))
-                    bookSize.setHeight(value);
-                else
-                    log.warn("Unknown key");
+                switch (sizeOrder[i]) {
+                    case "width" -> bookSize.setWidth(value);
+                    case "wide" -> bookSize.setWide(value);
+                    case "height" -> bookSize.setHeight(value);
+                    default -> log.warn("Unknown key");
+                }
             }
         } catch (NumberFormatException e) {
             log.error("Book Error:", e);
