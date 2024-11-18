@@ -4,8 +4,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.example.productservice.dto.response.CartItemResponse;
 import org.example.productservice.entity.Cart;
 import org.example.productservice.repository.CartRepository;
+import org.example.productservice.utils.MapperUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -46,5 +48,19 @@ public class CartRepositoryImpl implements CartRepository {
         }
 
         jdbcTemplate.update(sql.toString(), params);
+    }
+
+    @Override
+    public List<CartItemResponse> getAll(String user, int page, int pageSize) throws Exception {
+        String sql = """
+                SELECT c.book_id, c.quantity, b.name as book_name, b.main_image as image, b.price, b.discount
+                FROM cart c
+                LEFT JOIN book b ON b.id = c.book_id
+                WHERE c.user_id = ?
+                LIMIT ?, ? 
+                """;
+
+        return MapperUtils.mappingManyElement(CartItemResponse.class,
+                jdbcTemplate.queryForList(sql, user, (page - 1) * pageSize, pageSize));
     }
 }

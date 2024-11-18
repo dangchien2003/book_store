@@ -1,13 +1,17 @@
 package org.example.productservice.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.productservice.dto.request.AddCartItemRequest;
 import org.example.productservice.dto.response.ApiResponse;
+import org.example.productservice.dto.response.CartItemResponse;
 import org.example.productservice.service.CartService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,19 +27,20 @@ public class CartController {
         return ApiResponse.<Void>builder().build();
     }
 
-    @PatchMapping("update")
-    ApiResponse<Void> update(@Valid @RequestBody Object request) {
-        return ApiResponse.<Void>builder().build();
-    }
-
-    @DeleteMapping("remove")
-    ApiResponse<Void> remove(@Valid @RequestBody Object request) {
+    @DeleteMapping("remove/{bookId}")
+    ApiResponse<Void> remove(@RequestHeader(name = "user") String user,
+                             @PathVariable(name = "bookId") long bookId) {
+        cartService.remove(user, bookId);
         return ApiResponse.<Void>builder().build();
     }
 
     @GetMapping("all")
-    ApiResponse<Void> all(@Valid @RequestBody Object request) {
-        return ApiResponse.<Void>builder().build();
+    ApiResponse<List<CartItemResponse>> all(@RequestHeader(name = "user") String user,
+                                            @Valid @Min(value = 1, message = "INVALID_PAGE_NUMBER")
+                                            @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
+        return ApiResponse.<List<CartItemResponse>>builder()
+                .result(cartService.getAll(user, page))
+                .build();
     }
 
 }

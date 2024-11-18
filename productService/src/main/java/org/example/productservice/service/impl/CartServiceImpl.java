@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.request.AddCartItemRequest;
 import org.example.productservice.dto.response.BookDetailForValidate;
+import org.example.productservice.dto.response.CartItemResponse;
 import org.example.productservice.entity.Cart;
 import org.example.productservice.enums.BookStatus;
 import org.example.productservice.exception.AppException;
@@ -56,5 +57,22 @@ public class CartServiceImpl implements CartService {
         cartRepository.deleteAll(user, List.of(request.getBookId()));
         if (!cartRepository.create(cart))
             throw new AppException(ErrorCode.UPDATE_FAIL);
+    }
+
+    @Override
+    public void remove(String user, long bookId) {
+        cartRepository.deleteAll(user, List.of(bookId));
+    }
+
+    @Override
+    public List<CartItemResponse> getAll(String user, int page) {
+        int pageSize = 15;
+
+        try {
+            return cartRepository.getAll(user, page, pageSize);
+        } catch (Exception e) {
+            log.error("cart repository getAll error: ", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
