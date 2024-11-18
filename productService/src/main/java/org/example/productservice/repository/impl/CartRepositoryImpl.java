@@ -53,7 +53,7 @@ public class CartRepositoryImpl implements CartRepository {
     @Override
     public List<CartItemResponse> getAll(String user, int page, int pageSize) throws Exception {
         String sql = """
-                SELECT c.book_id, c.quantity, b.name as book_name, b.main_image as image, b.price, b.discount
+                SELECT c.book_id, c.quantity, b.name as book_name, b.main_image as image, b.price, b.discount, b.status_code
                 FROM cart c
                 LEFT JOIN book b ON b.id = c.book_id
                 WHERE c.user_id = ?
@@ -62,5 +62,30 @@ public class CartRepositoryImpl implements CartRepository {
 
         return MapperUtils.mappingManyElement(CartItemResponse.class,
                 jdbcTemplate.queryForList(sql, user, (page - 1) * pageSize, pageSize));
+    }
+
+    @Override
+    public boolean existAll(String user, long[] bookIds) {
+        StringBuilder sql = new StringBuilder("""
+                SELECT count(*) as count
+                FROM cart c
+                WHERE c.user_id = ? AND c.book_id IN(""");
+
+        StringJoiner param = new StringJoiner(",");
+        for (int i = 0; i < bookIds.length; i++) {
+            param.add("?");
+        }
+        sql.append(param);
+        sql.append(")");
+
+        Object[] params = new Object[bookIds.length + 1];
+        params[0] = user;
+        for (int i = 0; i < bookIds.length; i++) {
+            params[i + 1] = bookIds[i];
+        }
+
+        int exist = (int) jdbcTemplate.queryForMap(sql.toString(), params).get("count");
+
+        return exist == bookIds.length;
     }
 }

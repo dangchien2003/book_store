@@ -12,4 +12,6 @@ public interface CartRepository {
 
     List<CartItemResponse> getAll(String user, int page, int pageSize) throws Exception;
 
+    boolean existAll(String user, long[] bookIds);
+
 }

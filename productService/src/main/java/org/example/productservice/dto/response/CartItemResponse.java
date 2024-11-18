@@ -13,8 +13,9 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CartItemResponse {
     long bookId;
-    String bookName;
     int quantity;
+    String statusCode;
+    String bookName;
     String image;
     int price;
     int discount;
