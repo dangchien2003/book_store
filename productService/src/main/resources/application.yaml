@@ -7,9 +7,9 @@ spring:
   application:
     name: product-service
   datasource:
-    url: jdbc:mysql://localhost:3306/product
-    username: TASC
-    password: chienkoi123
+    url: ${DBMS_CONNECTION}
+    username: ${DBMS_USERNAME}
+    password: ${DBMS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 springdoc:
