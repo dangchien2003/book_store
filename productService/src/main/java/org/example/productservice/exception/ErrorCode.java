@@ -37,10 +37,10 @@ public enum ErrorCode {
 
     LIST_BOOK_EMPTY(3030, "Must have at least 1 book to add", HttpStatus.BAD_REQUEST),
 
-    QUANTITY_TOO_SMALL(1040, "Quantity must be greater than or equal to 1", HttpStatus.BAD_REQUEST),
-    QUANTITY_TOO_LARGE(1040, "Quantity must be less than or equal to 30", HttpStatus.BAD_REQUEST),
-    QUANTITY_NOT_ENOUGH(1042, "Quantity greater than available", HttpStatus.BAD_REQUEST),
-    ADD_TO_CART_FAILED(1043, "Could not add product to cart", HttpStatus.BAD_REQUEST),
+    QUANTITY_TOO_SMALL(3040, "Quantity must be greater than or equal to 1", HttpStatus.BAD_REQUEST),
+    QUANTITY_TOO_LARGE(3040, "Quantity must be less than or equal to 30", HttpStatus.BAD_REQUEST),
+    QUANTITY_NOT_ENOUGH(3042, "Quantity greater than available", HttpStatus.BAD_REQUEST),
+    ADD_TO_CART_FAILED(3043, "Could not add product to cart", HttpStatus.BAD_REQUEST),
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
