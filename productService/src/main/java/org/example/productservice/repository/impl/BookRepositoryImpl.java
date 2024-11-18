@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.response.BaseBookResponse;
+import org.example.productservice.dto.response.BookDetailForValidate;
 import org.example.productservice.dto.response.ManagerBookDetailResponse;
 import org.example.productservice.dto.response.ManagerFindBookResponse;
 import org.example.productservice.entity.Book;
@@ -151,5 +152,17 @@ public class BookRepositoryImpl implements BookRepository {
         return MapperUtils.mappingOneElement(ManagerBookDetailResponse.class,
                 jdbcTemplate.queryForMap(sql, bookId)
         );
+    }
+
+    @Override
+    synchronized public BookDetailForValidate getDetailForValidate(long bookId) throws Exception {
+        String sql = """
+                SELECT b.status_code, b.available_quantity as quantity
+                FROM book b
+                where b.id = ?
+                """;
+
+        return MapperUtils.mappingOneElement(BookDetailForValidate.class,
+                jdbcTemplate.queryForMap(sql, bookId));
     }
 }
