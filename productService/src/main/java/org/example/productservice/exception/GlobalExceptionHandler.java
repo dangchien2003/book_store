@@ -17,6 +17,9 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -94,6 +97,21 @@ public class GlobalExceptionHandler {
 
         try {
             ErrorCode errorCode = ENumUtils.getType(ErrorCode.class, firstErrorMessage);
+
+            if (ErrorCode.DATA_BLANK == errorCode) {
+                List<String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
+                        .filter(fieldError -> fieldError.getDefaultMessage().equals("DATA_BLANK"))
+                        .map(fieldError -> fieldError.getField())
+                        .collect(Collectors.toList());
+
+                return ResponseEntity
+                        .status(ErrorCode.DATA_BLANK.getHttpStatusCode())
+                        .body(ApiResponse.builder()
+                                .code(ErrorCode.DATA_BLANK.getCode())
+                                .message(ErrorCode.DATA_BLANK.getMessage() + String.join(", ", fieldErrors))
+                                .build());
+            }
+
             return setResponse(errorCode);
         } catch (AppException appException) {
             return ResponseEntity.
