@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,7 +20,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @ControllerAdvice
 @Slf4j
@@ -101,9 +102,9 @@ public class GlobalExceptionHandler {
 
             if (ErrorCode.DATA_BLANK == errorCode) {
                 List<String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
-                        .filter(fieldError -> fieldError.getDefaultMessage().equals("DATA_BLANK"))
-                        .map(fieldError -> fieldError.getField())
-                        .collect(Collectors.toList());
+                        .filter(fieldError -> Objects.equals(fieldError.getDefaultMessage(), firstErrorMessage))
+                        .map(FieldError::getField)
+                        .toList();
 
                 return ResponseEntity
                         .status(ErrorCode.DATA_BLANK.getHttpStatusCode())
