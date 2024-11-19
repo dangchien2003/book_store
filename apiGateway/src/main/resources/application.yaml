@@ -12,16 +12,38 @@ spring:
         locator:
           enabled: true
       routes:
+        - id: exclude_internal_paths
+          uri: no://op
+          predicates:
+            - Path=${app.api-prefix}/*/internal/**
+          filters:
+            - SetStatus=403
+
         - id: identity-service
           uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
             - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
+
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=${app.api-prefix}/product/**
+          filters:
+            - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
+
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=${app.api-prefix}/order/**
+          filters:
+            - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
+
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=${app.api-prefix}/payment/**
           filters:
             - RewritePath=/gateway/v1/(?<segment>.*), /${segment}
 
