@@ -7,16 +7,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.request.BookCreationRequest;
 import org.example.productservice.dto.request.BookUpdateRequest;
-import org.example.productservice.dto.response.BookCreationResponse;
-import org.example.productservice.dto.response.BookUpdateResponse;
-import org.example.productservice.dto.response.ManagerBookDetailResponse;
-import org.example.productservice.dto.response.ManagerFindBookResponse;
+import org.example.productservice.dto.request.GetDetailListBookRequest;
+import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 import org.example.productservice.enums.BookStatus;
 import org.example.productservice.exception.AppException;
 import org.example.productservice.exception.ErrorCode;
 import org.example.productservice.mapper.BookMapper;
-import org.example.productservice.repository.*;
+import org.example.productservice.repository.AuthorRepository;
+import org.example.productservice.repository.BookCategoryRepository;
+import org.example.productservice.repository.BookRepository;
+import org.example.productservice.repository.PublisherRepository;
 import org.example.productservice.service.BookService;
 import org.example.productservice.utils.ENumUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -37,7 +38,6 @@ public class BookServiceImpl implements BookService {
     AuthorRepository authorRepository;
     PublisherRepository publisherRepository;
     BookCategoryRepository bookCategoryRepository;
-    CategoryRepository categoryRepository;
     BookMapper bookMapper;
 
     static final int PAGE_SIZE_FOR_MANAGER_FIND = 2;
@@ -134,5 +134,20 @@ public class BookServiceImpl implements BookService {
         detail.setBookSize(Book.getBookSize(detail.getSize()));
         detail.setSize(null);
         return detail;
+    }
+
+    @Override
+    public List<DetailInternal> getDetailListBook(GetDetailListBookRequest request) {
+        if (request.getBookIds().isEmpty())
+            throw new AppException(ErrorCode.LIST_BOOK_EMPTY);
+
+        try {
+            return bookRepository.getListDetail(request.getBookIds().stream().toList());
+        } catch (EmptyResultDataAccessException e) {
+            return new ArrayList<>();
+        } catch (Exception e) {
+            log.error("book repository getListDetail error: ", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
     }
 }

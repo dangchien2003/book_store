@@ -1,10 +1,7 @@
 package org.example.productservice.repository;
 
 import org.example.productservice.dto.FindBook;
-import org.example.productservice.dto.response.BaseBookResponse;
-import org.example.productservice.dto.response.BookDetailForValidate;
-import org.example.productservice.dto.response.ManagerBookDetailResponse;
-import org.example.productservice.dto.response.ManagerFindBookResponse;
+import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 
 import java.util.List;
@@ -22,4 +19,6 @@ public interface BookRepository {
     ManagerBookDetailResponse getDetail(long bookId) throws Exception;
 
     BookDetailForValidate getDetailForValidate(long bookId) throws Exception;
+
+    List<DetailInternal> getListDetail(List<Long> bookIds) throws Exception;
 }

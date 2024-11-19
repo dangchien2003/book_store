@@ -29,6 +29,13 @@ public enum ErrorCode {
 
     INVALID_PAGE_NUMBER(1030, "Invalid page number", HttpStatus.BAD_REQUEST),
 
+    PRODUCT_QUANTITY_IS_TOO_SMALL(4010, "There must be at least 1 product in the order", HttpStatus.BAD_REQUEST),
+    PRODUCT_QUANTITY_IS_TOO_LARGE(4011, "Product quantity must be less than 10", HttpStatus.BAD_REQUEST),
+    BOOK_NOT_FOUND(4012, "Book not found", HttpStatus.NOT_FOUND),
+    INADEQUATE_QUANTITY(4013, "Product ? only has quantity: ?", HttpStatus.BAD_REQUEST),
+    BOOK_NOT_RELEASED(4014, "Book ? not released yet", HttpStatus.BAD_REQUEST),
+
+
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     int code;

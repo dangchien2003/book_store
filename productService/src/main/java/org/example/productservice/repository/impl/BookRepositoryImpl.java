@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
-import org.example.productservice.dto.response.BaseBookResponse;
-import org.example.productservice.dto.response.BookDetailForValidate;
-import org.example.productservice.dto.response.ManagerBookDetailResponse;
-import org.example.productservice.dto.response.ManagerFindBookResponse;
+import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 import org.example.productservice.repository.BookRepository;
 import org.example.productservice.utils.MapperUtils;
@@ -20,10 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -164,5 +158,28 @@ public class BookRepositoryImpl implements BookRepository {
 
         return MapperUtils.mappingOneElement(BookDetailForValidate.class,
                 jdbcTemplate.queryForMap(sql, bookId));
+    }
+
+    @Override
+    public List<DetailInternal> getListDetail(List<Long> bookIds) throws Exception {
+        StringBuilder sql = new StringBuilder("""
+                SELECT b.id, b.name, b.price, b.available_quantity as quantity, b.status_code
+                FROM book b
+                WHERE b.id IN""");
+
+        StringJoiner param = new StringJoiner(",", "(", ")");
+        for (int i = 0; i < bookIds.size(); i++) {
+            param.add("?");
+        }
+        sql.append(param);
+        sql.append(" ORDER BY b.id ASC");
+
+        Object[] params = new Object[bookIds.size()];
+        for (int i = 0; i < bookIds.size(); i++) {
+            params[i] = bookIds.get(i);
+        }
+
+        return MapperUtils.mappingManyElement(DetailInternal.class,
+                jdbcTemplate.queryForList(sql.toString(), params));
     }
 }

@@ -12,10 +12,11 @@ public class Order extends EntityWithTimestamps {
     String id;
     String purchaseBy;
     int communeAddressCode;
-    String paymentId;
+    String paymentMethod;
     String statusCode;
     String recipientName;
     String phoneNumber;
     String detailAddress;
     String trackingCode;
+    int total;
 }

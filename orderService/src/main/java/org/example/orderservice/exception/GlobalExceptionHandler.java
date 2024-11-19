@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Object>> handlingAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
-        return setResponse(errorCode);
+        return e.getMessage() != null ? setResponse(errorCode, e.getMessage()) : setResponse(errorCode);
     }
 
 
@@ -103,6 +103,16 @@ public class GlobalExceptionHandler {
                             .message(firstErrorMessage)
                             .build());
         }
+    }
+
+    ResponseEntity<ApiResponse<Object>> setResponse(ErrorCode errorCode, String message) {
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .message(message)
+                .code(errorCode.getCode())
+                .build();
+        return ResponseEntity.
+                status(errorCode.getHttpStatusCode())
+                .body(apiResponse);
     }
 
     ResponseEntity<ApiResponse<Object>> setResponse(ErrorCode errorCode) {
