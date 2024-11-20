@@ -12,4 +12,5 @@ public class PaymentMethod extends EntityWithTimestamps {
     String id;
     String name;
     String description;
+    byte active;
 }
