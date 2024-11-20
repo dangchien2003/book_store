@@ -9,9 +9,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Transaction extends EntityWithTimestamps {
-    String id;
     String orderId;
     String paymentMethod;
-    int totalAmount;
-    String statusCode;
+    int amount;
+    String status;
 }

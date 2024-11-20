@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.orderservice.dto.request.OrderCreationRequest;
 import org.example.orderservice.dto.response.ApiResponse;
+import org.example.orderservice.dto.response.TransactionCreationResponse;
 import org.example.orderservice.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +20,10 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("create")
-    ApiResponse<Object> create(@Valid @NotNull(message = "user blank") @RequestHeader("user") String user,
-                               @Valid @RequestBody OrderCreationRequest request) {
-        orderService.create(user, request);
-        return ApiResponse.<Object>builder()
-                .result(null)
+    ApiResponse<TransactionCreationResponse> create(@Valid @NotNull(message = "user blank") @RequestHeader("user") String user,
+                                                    @Valid @RequestBody OrderCreationRequest request) {
+        return ApiResponse.<TransactionCreationResponse>builder()
+                .result(orderService.create(user, request))
                 .build();
     }
 }

@@ -1,7 +1,8 @@
 package org.example.orderservice.service;
 
 import org.example.orderservice.dto.request.OrderCreationRequest;
+import org.example.orderservice.dto.response.TransactionCreationResponse;
 
 public interface OrderService {
-    void create(String uid, OrderCreationRequest request);
+    TransactionCreationResponse create(String uid, OrderCreationRequest request);
 }

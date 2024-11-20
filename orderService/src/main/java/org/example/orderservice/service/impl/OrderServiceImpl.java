@@ -4,12 +4,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.example.orderservice.dto.request.CreateTransactionRequest;
 import org.example.orderservice.dto.request.GetDetailListBookRequest;
 import org.example.orderservice.dto.request.ItemOrder;
 import org.example.orderservice.dto.request.OrderCreationRequest;
 import org.example.orderservice.dto.response.ApiResponse;
 import org.example.orderservice.dto.response.DetailInternal;
 import org.example.orderservice.dto.response.PaymentMethodDetail;
+import org.example.orderservice.dto.response.TransactionCreationResponse;
 import org.example.orderservice.entity.Order;
 import org.example.orderservice.enums.BookStatus;
 import org.example.orderservice.enums.OrderStatus;
@@ -40,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
     PaymentClient paymentClient;
 
     @Override
-    public void create(String uid, OrderCreationRequest request) {
+    public TransactionCreationResponse create(String uid, OrderCreationRequest request) {
 
         if (!checkAddressExistence(request.getCommuneAddressCode()))
             throw new AppException(ErrorCode.ADDRESS_NOT_FOUND);
@@ -102,6 +104,8 @@ public class OrderServiceImpl implements OrderService {
 
         if (orderRepository.create(order) < 1)
             throw new AppException(ErrorCode.UPDATE_FAIL);
+
+        return paymentClient.createTransaction(new CreateTransactionRequest(order.getId(), order.getPaymentMethod(), order.getTotal())).getResult();
     }
 
     void validateProductExistence(DetailInternal detailInternal, ItemOrder itemOrder) {

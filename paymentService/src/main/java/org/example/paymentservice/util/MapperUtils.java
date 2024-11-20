@@ -1,6 +1,8 @@
 package org.example.paymentservice.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.orderservice.exception.ErrorCode;
+import org.example.paymentservice.exception.AppException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -134,5 +136,26 @@ public class MapperUtils {
         }
 
         return result;
+    }
+
+    public static Map<String, Object> convertToMap(Object obj) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        Class<?> currentClass = obj.getClass();
+        while (currentClass != null) {
+            Field[] fields = currentClass.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                try {
+                    resultMap.put(field.getName(), field.get(obj));
+                } catch (Exception e) {
+                    log.error("convertToMap error: ", e);
+                    throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return resultMap;
     }
 }

@@ -29,6 +29,7 @@ public enum ErrorCode {
 
     INVALID_PAGE_NUMBER(1030, "Invalid page number", HttpStatus.BAD_REQUEST),
 
+    INVALID_AMOUNT(5010, "Amount too small", HttpStatus.BAD_REQUEST),
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
