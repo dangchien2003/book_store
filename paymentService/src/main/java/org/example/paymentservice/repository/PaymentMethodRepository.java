@@ -10,5 +10,5 @@ public interface PaymentMethodRepository {
 
     List<PaymentMethodDetail> getAll() throws Exception;
 
-    int editActive(String id, boolean active);
+    int editActive(String id, boolean active, long modifiedAt);
 }

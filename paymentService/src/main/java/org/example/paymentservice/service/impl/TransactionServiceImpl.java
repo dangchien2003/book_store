@@ -17,9 +17,11 @@ import org.example.paymentservice.exception.AppException;
 import org.example.paymentservice.mapper.TransactionMapper;
 import org.example.paymentservice.repository.TransactionRepository;
 import org.example.paymentservice.service.TransactionService;
+import org.example.paymentservice.service.VnpayService;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.util.EnumUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -31,6 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     TransactionRepository transactionRepository;
     TransactionMapper transactionMapper;
+    VnpayService vnpayService;
 
     @NonFinal
     int minutesDestroyScanForBanking = 60;
@@ -53,7 +56,14 @@ public class TransactionServiceImpl implements TransactionService {
                 countDown = convertMinutesToSeconds(minutesDestroyScanForBanking);
                 addScheduleForBanking(transaction.getOrderId(), transaction.getAmount(), countDown);
             }
-            case VNPAY -> urlRedirect = "vn pay";
+            case VNPAY -> {
+                try {
+                    urlRedirect = vnpayService.generateUrl(request.getOrderId(), request.getAmount());
+                } catch (UnsupportedEncodingException e) {
+                    log.error("vnpayService.generateUrl error: ", e);
+                    throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+                }
+            }
             case COD -> log.info("cod");
         }
 

@@ -48,16 +48,17 @@ public class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
     }
 
     @Override
-    public int editActive(String id, boolean active) {
+    public int editActive(String id, boolean active, long modifiedAt) {
         String sql = """
                 UPDATE payment_method p
-                SET p.active = :active
+                SET p.active = :active, p.modified_at = :modifiedAt
                 WHERE p.id = :id
                 """;
 
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
         params.put("active", active ? 1 : 0);
+        params.put("modifiedAt", modifiedAt);
         return namedParameterJdbcTemplate.update(sql, params);
     }
 }

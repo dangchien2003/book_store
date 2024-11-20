@@ -15,6 +15,7 @@ import org.example.paymentservice.repository.PaymentMethodRepository;
 import org.example.paymentservice.service.PaymentMethodService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -48,6 +49,6 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
 
     @Override
     public void updateActive(String id, EditActiveForPaymentMethodRequest request) {
-        paymentMethodRepository.editActive(id, request.getActive());
+        paymentMethodRepository.editActive(id, request.getActive(), Instant.now().toEpochMilli());
     }
 }
