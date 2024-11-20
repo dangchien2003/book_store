@@ -15,4 +15,5 @@ public class TransactionCreationResponse {
     String code;
     int amount;
     int canceledAfter;
+    String paymentMethod;
 }

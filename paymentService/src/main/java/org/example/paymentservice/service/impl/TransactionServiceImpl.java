@@ -75,6 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .amount(transaction.getAmount())
                 .canceledAfter(countDown)
                 .code(transaction.getOrderId())
+                .paymentMethod(method.name())
                 .build();
     }
 
