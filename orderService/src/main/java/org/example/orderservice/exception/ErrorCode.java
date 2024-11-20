@@ -36,6 +36,7 @@ public enum ErrorCode {
     BOOK_NOT_RELEASED(4014, "Book ? not released yet", HttpStatus.BAD_REQUEST),
     ADDRESS_NOT_FOUND(4015, "Receiving address not supported", HttpStatus.NOT_FOUND),
     PAYMENT_METHOD_NOT_FOUND(4016, "Receiving payment method not supported", HttpStatus.NOT_FOUND),
+    INVALID_PHONE_NUMBER(4017, "Invalid phone number", HttpStatus.BAD_REQUEST),
 
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),

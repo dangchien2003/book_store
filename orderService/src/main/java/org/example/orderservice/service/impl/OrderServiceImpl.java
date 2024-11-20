@@ -50,6 +50,9 @@ public class OrderServiceImpl implements OrderService {
         if (checkForOverstockedProducts(request.getItems()))
             throw new AppException(ErrorCode.PRODUCT_QUANTITY_IS_TOO_LARGE);
 
+        if (!checkPhoneNumber(request.getPhoneNumber()))
+            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
+
         if (!checkPaymentMethodExistence(request.getPaymentMethod()))
             throw new AppException(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
 
@@ -141,5 +144,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return false;
+    }
+
+    boolean checkPhoneNumber(String phone) {
+        return phone.matches("^0\\d{9}$");
     }
 }
