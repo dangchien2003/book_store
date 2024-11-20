@@ -3,6 +3,7 @@ package org.example.paymentservice.service.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.example.orderservice.exception.ErrorCode;
 import org.example.paymentservice.configuration.ScheduleRunner;
@@ -31,6 +32,9 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionRepository transactionRepository;
     TransactionMapper transactionMapper;
 
+    @NonFinal
+    int minutesDestroyScanForBanking = 60;
+
     @Override
     public TransactionCreationResponse create(CreateTransactionRequest request) {
         Transaction transaction = transactionMapper.toTransaction(request);
@@ -40,35 +44,42 @@ public class TransactionServiceImpl implements TransactionService {
         if (transactionRepository.create(transaction) == 0)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
+        int countDown = 0;
+        String urlRedirect = null;
         PaymentMethodType method = EnumUtils.findEnumInsensitiveCase(PaymentMethodType.class, transaction.getPaymentMethod());
-
         switch (method) {
-            case PAYPAL -> {
-                ScheduleRunner.waitForPaymentPaypal.put(transaction.getOrderId(), transaction.getAmount());
-                return TransactionCreationResponse.builder()
-                        .amount(transaction.getAmount())
-                        .canceledAfter(3600)
-                        .code(transaction.getOrderId())
-                        .redirect("link")
-                        .build();
+            case PAYPAL -> ScheduleRunner.waitForPaymentPaypal.put(transaction.getOrderId(), transaction.getAmount());
+            case BANKING -> {
+                countDown = convertMinutesToSeconds(minutesDestroyScanForBanking);
+                addScheduleForBanking(transaction.getOrderId(), transaction.getAmount(), countDown);
             }
-            case BANKING -> addScheduleBanking(transaction.getOrderId(), transaction.getAmount(), 1, ChronoUnit.HOURS);
+            case VNPAY -> urlRedirect = "vn pay";
+            case COD -> log.info("cod");
         }
+
+        if (transactionRepository.updateStatus(transaction.getOrderId(), TransactionStatus.PENDING) == 0)
+            throw new AppException(ErrorCode.UPDATE_STATUS_FAIL);
+
         return TransactionCreationResponse.builder()
+                .redirect(urlRedirect)
                 .amount(transaction.getAmount())
-                .canceledAfter(3600)
+                .canceledAfter(countDown)
                 .code(transaction.getOrderId())
                 .build();
     }
 
-    void addScheduleBanking(String orderId, int amount, int removeAfter, ChronoUnit unit) {
-        long removeAt = Instant.now().plus(removeAfter, unit).toEpochMilli();
+    void addScheduleForBanking(String orderId, int amount, int removeAfterSeconds) {
+        long removeAt = Instant.now().plus(removeAfterSeconds, ChronoUnit.SECONDS).toEpochMilli();
         DataBankingQueue dataBankingQueue = DataBankingQueue.builder()
                 .amount(amount)
                 .removeAt(removeAt)
                 .build();
 
         ScheduleRunner.waitForPaymentBanking.put(orderId, dataBankingQueue);
+    }
+
+    public static int convertMinutesToSeconds(int minute) {
+        return minute * 60;
     }
 
 }

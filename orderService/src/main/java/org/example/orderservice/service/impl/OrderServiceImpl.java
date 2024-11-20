@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,32 @@ public class OrderServiceImpl implements OrderService {
         if (orderRepository.create(order) < 1)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        return paymentClient.createTransaction(new CreateTransactionRequest(order.getId(), order.getPaymentMethod(), order.getTotal())).getResult();
+        return createTransaction(order);
+    }
+
+    TransactionCreationResponse createTransaction(Order order) {
+        TransactionCreationResponse transaction = null;
+        try {
+            transaction = paymentClient.createTransaction(
+                            new CreateTransactionRequest(order.getId(), order.getPaymentMethod(), order.getTotal()))
+                    .getResult();
+        } catch (Exception e) {
+            log.error("paymentClient.createTransaction error: ", e);
+        }
+
+        String status;
+        if (Objects.isNull(transaction)) {
+            status = OrderStatus.TRANSACTION_ERROR.name();
+        } else {
+            status = OrderStatus.PAYMENT_PENDING.name();
+        }
+
+        if (orderRepository.updateStatus(order.getId(), status) == 0) {
+            log.warn("updateStatus error");
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
+        return transaction;
     }
 
     void validateProductExistence(DetailInternal detailInternal, ItemOrder itemOrder) {

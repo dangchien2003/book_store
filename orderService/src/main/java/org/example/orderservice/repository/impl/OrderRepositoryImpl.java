@@ -55,4 +55,15 @@ public class OrderRepositoryImpl implements OrderRepository {
         });
 
     }
+
+    @Override
+    public int updateStatus(String orderId, String status) {
+        String sql = """
+                UPDATE `order`
+                SET status_code = ?
+                WHERE id = ?
+                """;
+
+        return jdbcTemplate.update(sql, status, orderId);
+    }
 }

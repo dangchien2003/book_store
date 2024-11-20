@@ -6,5 +6,6 @@ public enum OrderStatus {
     CANCEL,
     SUCCESS,
     PAYMENT_DUE,
+    TRANSACTION_ERROR
 
 }

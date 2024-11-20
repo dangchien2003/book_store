@@ -31,6 +31,8 @@ public enum ErrorCode {
 
     INVALID_AMOUNT(5010, "Amount too small", HttpStatus.BAD_REQUEST),
 
+    UPDATE_STATUS_FAIL(5020, "Update status error", HttpStatus.INTERNAL_SERVER_ERROR),
+
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     int code;
