@@ -9,6 +9,7 @@ import org.example.orderservice.dto.request.ItemOrder;
 import org.example.orderservice.dto.request.OrderCreationRequest;
 import org.example.orderservice.dto.response.ApiResponse;
 import org.example.orderservice.dto.response.DetailInternal;
+import org.example.orderservice.dto.response.PaymentMethodDetail;
 import org.example.orderservice.entity.Order;
 import org.example.orderservice.enums.BookStatus;
 import org.example.orderservice.enums.OrderStatus;
@@ -16,6 +17,7 @@ import org.example.orderservice.exception.AppException;
 import org.example.orderservice.exception.ErrorCode;
 import org.example.orderservice.repository.CommuneRepository;
 import org.example.orderservice.repository.OrderRepository;
+import org.example.orderservice.repository.httpClient.PaymentClient;
 import org.example.orderservice.repository.httpClient.ProductClient;
 import org.example.orderservice.service.OrderService;
 import org.example.orderservice.util.RandomUtils;
@@ -35,19 +37,19 @@ public class OrderServiceImpl implements OrderService {
     ProductClient productClient;
     OrderRepository orderRepository;
     CommuneRepository communeRepository;
+    PaymentClient paymentClient;
 
     @Override
     public void create(String uid, OrderCreationRequest request) {
 
-//        check payment method
-        // get all payment method
-        // validate
+        if (!checkAddressExistence(request.getCommuneAddressCode()))
+            throw new AppException(ErrorCode.ADDRESS_NOT_FOUND);
 
-        if (validateQuantity(request.getItems()))
+        if (checkForOverstockedProducts(request.getItems()))
             throw new AppException(ErrorCode.PRODUCT_QUANTITY_IS_TOO_LARGE);
 
-        if (!validateAddress(request.getCommuneAddressCode()))
-            throw new AppException(ErrorCode.CUSTOM_MESSAGE);
+        if (!checkPaymentMethodExistence(request.getPaymentMethod()))
+            throw new AppException(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
 
         Set<Long> bookIds = request.getItems().stream()
                 .map(ItemOrder::getBookId)
@@ -74,9 +76,9 @@ public class OrderServiceImpl implements OrderService {
             DetailInternal detailInternal = detailsResponse.getResult().get(i);
             ItemOrder itemOrder = sortedItems.get(i);
 
-            validateStatus(detailInternal);
+            validateProductStatus(detailInternal);
 
-            validateQuantity(detailInternal, itemOrder);
+            validateProductExistence(detailInternal, itemOrder);
 
             // calculator total
             total += detailInternal.getPrice() * itemOrder.getQuantity();
@@ -102,17 +104,17 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.UPDATE_FAIL);
     }
 
-    void validateQuantity(DetailInternal detailInternal, ItemOrder itemOrder) {
+    void validateProductExistence(DetailInternal detailInternal, ItemOrder itemOrder) {
         if (detailInternal.getQuantity() < itemOrder.getQuantity())
             throw new AppException(ErrorCode.INADEQUATE_QUANTITY, detailInternal.getName(), detailInternal.getQuantity());
     }
 
-    void validateStatus(DetailInternal detailInternal) {
+    void validateProductStatus(DetailInternal detailInternal) {
         if (!detailInternal.getStatusCode().equals(BookStatus.ON_SALE.name()))
             throw new AppException(ErrorCode.BOOK_NOT_RELEASED, detailInternal.getName());
     }
 
-    boolean validateQuantity(Set<ItemOrder> items) {
+    boolean checkForOverstockedProducts(Set<ItemOrder> items) {
         int sum = 0;
         for (ItemOrder item : items) {
             sum += item.getQuantity();
@@ -121,7 +123,19 @@ public class OrderServiceImpl implements OrderService {
         return sum > 10;
     }
 
-    boolean validateAddress(int commune) {
+    boolean checkAddressExistence(int commune) {
         return communeRepository.existById(commune);
+    }
+
+    boolean checkPaymentMethodExistence(String paymentMethod) {
+        List<PaymentMethodDetail> methods = paymentClient.getAllPaymentMethod().getResult();
+
+        for (PaymentMethodDetail method : methods) {
+            if (method.getId().equals(paymentMethod)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
