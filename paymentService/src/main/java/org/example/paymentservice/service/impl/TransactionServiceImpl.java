@@ -58,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
             case VNPAY -> {
                 try {
-                    urlRedirect = vnpayService.generateUrl(request.getOrderId(), request.getAmount());
+                    urlRedirect = vnpayService.generateUrl(request.getOrderId(), request.getAmount(), request.getIpAddress());
                 } catch (UnsupportedEncodingException e) {
                     log.error("vnpayService.generateUrl error: ", e);
                     throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);

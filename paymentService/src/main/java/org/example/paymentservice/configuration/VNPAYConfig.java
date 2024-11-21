@@ -14,10 +14,9 @@ import java.util.*;
 @FieldDefaults(makeFinal = true)
 public class VNPAYConfig {
     public static String vnpPayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnpReturnUrl = "https://ledangchien.com";
+    public static String vnpReturnUrl = "http://localhost:8085/payment/callback/vn-pay/check";
     public static String vnpTmnCode = "7XG1D3QU";
     public static String secretKey = "DFI9X55CGVDGQFRX08ZRGSNJPEZZG4LL";
-    public static String vnpApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String getQueryUrl(Map fields) throws UnsupportedEncodingException {
         List fieldNames = new ArrayList(fields.keySet());
@@ -52,7 +51,6 @@ public class VNPAYConfig {
 
     public static String hmacSHA512(final String key, final String data) {
         try {
-
             if (key == null || data == null) {
                 throw new NullPointerException();
             }

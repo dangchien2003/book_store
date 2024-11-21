@@ -7,4 +7,6 @@ public interface TransactionRepository {
     int create(Transaction transaction);
 
     int updateStatus(String orderId, TransactionStatus status);
+
+    Transaction getTransaction(String orderId) throws Exception;
 }

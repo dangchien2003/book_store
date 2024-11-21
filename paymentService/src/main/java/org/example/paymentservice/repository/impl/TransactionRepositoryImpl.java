@@ -42,4 +42,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         return namedParameterJdbcTemplate.update(sql, params);
     }
+
+    @Override
+    public Transaction getTransaction(String orderId) throws Exception {
+        String sql = """
+                SELECT amount, status, created_at
+                FROM transaction
+                WHERE order_id = :orderId
+                """;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderId", orderId);
+
+        return MapperUtils.mappingOneElement(Transaction.class,
+                namedParameterJdbcTemplate.queryForMap(sql, params));
+    }
 }

@@ -1,5 +1,6 @@
 package org.example.orderservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -20,10 +21,11 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("create")
-    ApiResponse<TransactionCreationResponse> create(@Valid @NotNull(message = "user blank") @RequestHeader("user") String user,
+    ApiResponse<TransactionCreationResponse> create(HttpServletRequest httpServletRequest,
+                                                    @Valid @NotNull(message = "user blank") @RequestHeader("user") String user,
                                                     @Valid @RequestBody OrderCreationRequest request) {
         return ApiResponse.<TransactionCreationResponse>builder()
-                .result(orderService.create(user, request))
+                .result(orderService.create(httpServletRequest, user, request))
                 .build();
     }
 }

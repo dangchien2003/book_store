@@ -17,4 +17,6 @@ public class CreateTransactionRequest {
     String orderId;
     @Min(value = 0, message = "INVALID_AMOUNT")
     int amount;
+    @NotBlank(message = "DATA_BLANK")
+    String ipAddress;
 }

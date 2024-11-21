@@ -33,6 +33,8 @@ public enum ErrorCode {
 
     UPDATE_STATUS_FAIL(5020, "Update status error", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    VALIDATE_INFO_PAYMENT_ERROR(5030, "Payment failed", HttpStatus.BAD_REQUEST),
+
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     int code;

@@ -1,5 +1,6 @@
 package org.example.orderservice.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ import org.example.orderservice.repository.httpClient.PaymentClient;
 import org.example.orderservice.repository.httpClient.ProductClient;
 import org.example.orderservice.service.OrderService;
 import org.example.orderservice.util.RandomUtils;
+import org.example.orderservice.util.RequestUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -43,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
     PaymentClient paymentClient;
 
     @Override
-    public TransactionCreationResponse create(String uid, OrderCreationRequest request) {
+    public TransactionCreationResponse create(HttpServletRequest httpServletRequest, String uid, OrderCreationRequest request) {
 
         if (!checkAddressExistence(request.getCommuneAddressCode()))
             throw new AppException(ErrorCode.ADDRESS_NOT_FOUND);
@@ -109,14 +111,15 @@ public class OrderServiceImpl implements OrderService {
         if (orderRepository.create(order) < 1)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        return createTransaction(order);
+        return createTransaction(RequestUtils.getClientIP(httpServletRequest), order);
     }
 
-    TransactionCreationResponse createTransaction(Order order) {
+    TransactionCreationResponse createTransaction(String ipAddress, Order order) {
+        System.out.println(ipAddress);
         TransactionCreationResponse transaction = null;
         try {
             transaction = paymentClient.createTransaction(
-                            new CreateTransactionRequest(order.getId(), order.getPaymentMethod(), order.getTotal()))
+                            new CreateTransactionRequest(order.getId(), order.getPaymentMethod(), order.getTotal(), ipAddress))
                     .getResult();
         } catch (Exception e) {
             log.error("paymentClient.createTransaction error: ", e);
