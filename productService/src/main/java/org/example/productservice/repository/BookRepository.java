@@ -21,4 +21,6 @@ public interface BookRepository {
     BookDetailForValidate getDetailForValidate(long bookId) throws Exception;
 
     List<DetailInternal> getListDetail(List<Long> bookIds) throws Exception;
+
+    int updateQuantity(List<QuantityBookAfterMinusResponse> data, List<Long> ids);
 }

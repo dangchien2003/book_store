@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.request.BookCreationRequest;
+import org.example.productservice.dto.request.BookMinusQuantityRequest;
 import org.example.productservice.dto.request.BookUpdateRequest;
 import org.example.productservice.dto.request.GetDetailListBookRequest;
 import org.example.productservice.dto.response.*;
@@ -22,11 +23,9 @@ import org.example.productservice.service.BookService;
 import org.example.productservice.utils.ENumUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -149,5 +148,47 @@ public class BookServiceImpl implements BookService {
             log.error("book repository getListDetail error: ", e);
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
+    }
+
+    @Override
+    @Transactional
+    public List<QuantityBookAfterMinusResponse> minusQuantityBooks(List<BookMinusQuantityRequest> request) {
+
+        List<Long> bookIds = request.stream()
+                .sorted(Comparator.comparing(BookMinusQuantityRequest::getBookId))
+                .map(BookMinusQuantityRequest::getBookId)
+                .toList();
+
+        List<DetailInternal> books;
+        try {
+            books = bookRepository.getListDetail(bookIds);
+        } catch (Exception e) {
+            log.error("bookRepository.getListDetail error", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
+        if (books.size() != request.size())
+            throw new AppException(ErrorCode.NOTFOUND_DATA);
+
+        books.sort(Comparator.comparing(DetailInternal::getId));
+        request.sort(Comparator.comparing(BookMinusQuantityRequest::getBookId));
+        List<QuantityBookAfterMinusResponse> newQuantity = new ArrayList<>();
+        for (int i = 0; i < books.size(); i++) {
+            int availableQuantity = books.get(i).getQuantity();
+            int minusQuantity = request.get(i).getQuantity();
+            if (availableQuantity < minusQuantity)
+                throw new AppException(ErrorCode.QUANTITY_NOT_ENOUGH);
+
+            // set new quantity
+            books.get(i).setQuantity(availableQuantity - minusQuantity);
+
+            // convert to new data and response
+            newQuantity.add(bookMapper.toQuantityBookAfterMinusResponse(books.get(i)));
+        }
+
+        if (bookRepository.updateQuantity(newQuantity, bookIds) != bookIds.size())
+            throw new AppException(ErrorCode.UPDATE_FAIL);
+
+        return newQuantity;
     }
 }

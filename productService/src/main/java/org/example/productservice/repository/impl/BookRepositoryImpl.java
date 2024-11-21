@@ -182,4 +182,30 @@ public class BookRepositoryImpl implements BookRepository {
         return MapperUtils.mappingManyElement(DetailInternal.class,
                 jdbcTemplate.queryForList(sql.toString(), params));
     }
+
+    @Override
+    public int updateQuantity(List<QuantityBookAfterMinusResponse> data, List<Long> ids) {
+        StringBuilder sql = new StringBuilder("""
+                UPDATE book
+                SET available_quantity = CASE
+                """);
+        List<Object> params = new ArrayList<>();
+        StringJoiner where = new StringJoiner(",", "(", ")");
+
+        for (QuantityBookAfterMinusResponse item : data) {
+            sql.append(" WHEN id = ? THEN ? ");
+            params.addLast(item.getBookId());
+            params.addLast(item.getQuantity());
+            where.add("?");
+        }
+
+        sql.append("""
+                ELSE available_quantity
+                END
+                WHERE id IN
+                """);
+        sql.append(where);
+
+        return jdbcTemplate.update(sql.toString(), params, ids);
+    }
 }
