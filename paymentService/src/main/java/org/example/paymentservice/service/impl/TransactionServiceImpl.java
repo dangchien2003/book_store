@@ -17,7 +17,7 @@ import org.example.paymentservice.exception.AppException;
 import org.example.paymentservice.mapper.TransactionMapper;
 import org.example.paymentservice.repository.TransactionRepository;
 import org.example.paymentservice.service.TransactionService;
-import org.example.paymentservice.service.VnpayService;
+import org.example.paymentservice.service.VnPayService;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.util.EnumUtils;
 
@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     TransactionRepository transactionRepository;
     TransactionMapper transactionMapper;
-    VnpayService vnpayService;
+    VnPayService vnpayService;
 
     @NonFinal
     int minutesDestroyScanForBanking = 60;
@@ -67,7 +67,7 @@ public class TransactionServiceImpl implements TransactionService {
             case COD -> log.info("cod");
         }
 
-        if (transactionRepository.updateStatus(transaction.getOrderId(), TransactionStatus.PENDING) == 0)
+        if (transactionRepository.updateStatus(transaction.getOrderId(), TransactionStatus.PENDING, Instant.now().toEpochMilli()) == 0)
             throw new AppException(ErrorCode.UPDATE_STATUS_FAIL);
 
         return TransactionCreationResponse.builder()

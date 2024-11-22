@@ -189,14 +189,23 @@ public class BookRepositoryImpl implements BookRepository {
                 UPDATE book
                 SET available_quantity = CASE
                 """);
-        List<Object> params = new ArrayList<>();
+
+        Object[] params = new Object[ids.size() * 3];
         StringJoiner where = new StringJoiner(",", "(", ")");
 
-        for (QuantityBookAfterMinusResponse item : data) {
+        int currentParamsWhere = ids.size() * 2;
+        int currentIndex = 0;
+        for (int i = 0; i < ids.size(); i++) {
             sql.append(" WHEN id = ? THEN ? ");
-            params.addLast(item.getBookId());
-            params.addLast(item.getQuantity());
             where.add("?");
+
+            QuantityBookAfterMinusResponse itemData = data.get(i);
+            params[currentIndex] = itemData.getBookId();
+            params[currentIndex + 1] = itemData.getQuantity();
+            params[currentParamsWhere] = itemData.getBookId();
+
+            currentIndex += 2;
+            currentParamsWhere += 1;
         }
 
         sql.append("""
@@ -206,6 +215,6 @@ public class BookRepositoryImpl implements BookRepository {
                 """);
         sql.append(where);
 
-        return jdbcTemplate.update(sql.toString(), params, ids);
+        return jdbcTemplate.update(sql.toString(), params);
     }
 }

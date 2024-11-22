@@ -57,13 +57,13 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public int updateStatus(String orderId, String status) {
+    public int updateStatus(String orderId, long modifiedAt, String status) {
         String sql = """
                 UPDATE `order`
-                SET status_code = ?
+                SET status_code = ?, modified_at = ?
                 WHERE id = ?
                 """;
 
-        return jdbcTemplate.update(sql, status, orderId);
+        return jdbcTemplate.update(sql, status, modifiedAt, orderId);
     }
 }

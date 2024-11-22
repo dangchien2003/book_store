@@ -6,6 +6,8 @@ public enum OrderStatus {
     CANCEL,
     SUCCESS,
     PAYMENT_DUE,
-    TRANSACTION_ERROR
+    TRANSACTION_ERROR,
+    ADD_DETAIL_ERROR,
+    MINUS_ERROR,
 
 }

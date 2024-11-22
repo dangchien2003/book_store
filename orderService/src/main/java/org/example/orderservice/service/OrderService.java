@@ -6,4 +6,6 @@ import org.example.orderservice.dto.response.TransactionCreationResponse;
 
 public interface OrderService {
     TransactionCreationResponse create(HttpServletRequest httpServletRequest, String uid, OrderCreationRequest request);
+
+    void orderPaymentSuccess(String orderId);
 }

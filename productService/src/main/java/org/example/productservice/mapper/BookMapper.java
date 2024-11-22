@@ -13,6 +13,6 @@ public interface BookMapper {
     @Mapping(target = "statusCode", ignore = true)
     Book toBook(BookCreationRequest request);
 
-
+    @Mapping(target = "bookId", source = "id")
     QuantityBookAfterMinusResponse toQuantityBookAfterMinusResponse(DetailInternal detailInternal);
 }

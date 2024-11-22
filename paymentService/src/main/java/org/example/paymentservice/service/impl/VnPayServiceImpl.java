@@ -13,10 +13,12 @@ import org.example.paymentservice.dto.request.VnPayCheckTransactionRequest;
 import org.example.paymentservice.dto.response.CheckTransactionResponse;
 import org.example.paymentservice.dto.response.VnPayCheckTransactionResponse;
 import org.example.paymentservice.entity.Transaction;
+import org.example.paymentservice.enums.TransactionStatus;
 import org.example.paymentservice.exception.AppException;
 import org.example.paymentservice.repository.TransactionRepository;
+import org.example.paymentservice.repository.httpClient.OrderClient;
 import org.example.paymentservice.repository.httpClient.VnPayClient;
-import org.example.paymentservice.service.VnpayService;
+import org.example.paymentservice.service.VnPayService;
 import org.example.paymentservice.util.PaymentUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,16 +26,19 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class VnpayServiceImpl implements VnpayService {
+public class VnPayServiceImpl implements VnPayService {
 
     TransactionRepository transactionRepository;
+    OrderClient orderClient;
     VnPayClient vnPayClient;
+
     @NonFinal
     @Value("${vnPay.api-url}")
     String url1;
@@ -87,6 +92,9 @@ public class VnpayServiceImpl implements VnpayService {
         String vnpOrderInfo = "Kiem tra ket qua GD OrderId:" + vnpTxnRef;
 
         Transaction transaction = getTransaction(vnpTxnRef);
+//        if (transaction.getStatus().equals(TransactionStatus.SUCCESS.name()))
+
+
         String vnpCreateDate = TimeUtils.convertTimestampToString(transaction.getCreatedAt(), "yyyyMMddHHmmss");
 
         String hashData = String.join("|", vnpRequestId, vnpVersion, vnpCommand, vnpTmnCode, vnpTxnRef, paymentDate, vnpCreateDate, ipAddress, vnpOrderInfo);
@@ -110,13 +118,20 @@ public class VnpayServiceImpl implements VnpayService {
         if (response.getVnpTransactionStatus() == null ||
                 !response.getVnpTransactionStatus().equals("00") ||
                 !response.getVnpResponseCode().equals("00")) {
-            System.out.println(response);
             throw new AppException(ErrorCode.CUSTOM_MESSAGE);
         }
 
-        // call api trừ kho
-        // cập nhật lại trạng thái
-//        Trả về
+        if (transactionRepository.updateStatus(vnpTxnRef, TransactionStatus.SUCCESS, Instant.now().toEpochMilli()) != 1) {
+            log.error("update status success error for transaction: " + vnpTxnRef);
+            throw new AppException(ErrorCode.PAYMENT_SUCCESS_BUT_UPDATE_STATUS_FAIL);
+        }
+
+        try {
+            orderClient.callPaymentSuccess(vnpTxnRef);
+        } catch (Exception e) {
+            log.error("orderClient.callPaymentSuccess error: ", e);
+            throw new AppException(ErrorCode.ERROR_CALL_TO_ORDER_CLIENT);
+        }
 
         return CheckTransactionResponse.builder()
                 .orderId(vnpTxnRef)

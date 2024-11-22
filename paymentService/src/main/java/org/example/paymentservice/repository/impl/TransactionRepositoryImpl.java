@@ -30,15 +30,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public int updateStatus(String orderId, TransactionStatus status) {
+    public int updateStatus(String orderId, TransactionStatus status, long modifiedAt) {
         String sql = """
                 UPDATE transaction
-                SET status = :status
+                SET status = :status, modified_at = :modifiedAt
                 WHERE order_id = :orderId
                 """;
         Map<String, Object> params = new HashMap<>();
         params.put("status", status.name());
         params.put("orderId", orderId);
+        params.put("modifiedAt", modifiedAt);
 
         return namedParameterJdbcTemplate.update(sql, params);
     }

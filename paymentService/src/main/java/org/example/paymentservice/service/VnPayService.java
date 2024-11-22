@@ -5,7 +5,7 @@ import org.example.paymentservice.dto.response.CheckTransactionResponse;
 
 import java.io.UnsupportedEncodingException;
 
-public interface VnpayService {
+public interface VnPayService {
     String generateUrl(String orderId, int amount, String ipAddress) throws UnsupportedEncodingException;
 
     CheckTransactionResponse queryTransaction(HttpServletRequest request);

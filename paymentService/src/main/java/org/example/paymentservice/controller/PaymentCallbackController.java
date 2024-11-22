@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.orderservice.dto.response.ApiResponse;
 import org.example.paymentservice.dto.response.CheckTransactionResponse;
-import org.example.paymentservice.service.VnpayService;
+import org.example.paymentservice.service.VnPayService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentCallbackController {
 
-    VnpayService vnpayService;
+    VnPayService vnpayService;
 
     @GetMapping("vn-pay/check")
     ApiResponse<CheckTransactionResponse> vnPayCheckTransaction(HttpServletRequest request) {

@@ -38,6 +38,8 @@ public enum ErrorCode {
     PAYMENT_METHOD_NOT_FOUND(4016, "Receiving payment method not supported", HttpStatus.NOT_FOUND),
     INVALID_PHONE_NUMBER(4017, "Invalid phone number", HttpStatus.BAD_REQUEST),
 
+    MINUS_BOOK_ERROR(4020, "Action minus number of failures ", HttpStatus.INTERNAL_SERVER_ERROR),
+
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

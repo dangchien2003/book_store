@@ -6,7 +6,7 @@ import org.example.paymentservice.enums.TransactionStatus;
 public interface TransactionRepository {
     int create(Transaction transaction);
 
-    int updateStatus(String orderId, TransactionStatus status);
+    int updateStatus(String orderId, TransactionStatus status, long modifiedAt);
 
     Transaction getTransaction(String orderId) throws Exception;
 }
