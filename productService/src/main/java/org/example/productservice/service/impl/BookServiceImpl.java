@@ -13,6 +13,7 @@ import org.example.productservice.dto.request.GetDetailListBookRequest;
 import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 import org.example.productservice.enums.BookStatus;
+import org.example.productservice.enums.PrefixCache;
 import org.example.productservice.exception.AppException;
 import org.example.productservice.exception.ErrorCode;
 import org.example.productservice.mapper.BookMapper;
@@ -100,7 +101,6 @@ public class BookServiceImpl implements BookService {
 
         List<Long> filterInBookIds = null;
 
-
         try {
             if (!Objects.isNull(category)) {
                 filterInBookIds = bookCategoryRepository.getAllBookByCategory(category, numberPage, PAGE_SIZE_FOR_MANAGER_FIND);
@@ -127,17 +127,24 @@ public class BookServiceImpl implements BookService {
     @Override
     public ManagerBookDetailResponse mGetDetail(long bookId) {
         ManagerBookDetailResponse detail;
-        try {
-            detail = bookRepository.getDetail(bookId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new AppException(ErrorCode.NOTFOUND_DATA);
-        } catch (Exception e) {
-            log.error("Book repository error: ", e);
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        Book book = redisService.get(PrefixCache.BOOK_.name() + bookId);
+        if (book != null) {
+            detail = bookMapper.toManagerBookDetailResponse(book);
+        } else {
+            try {
+                detail = bookRepository.getDetail(bookId);
+            } catch (EmptyResultDataAccessException e) {
+                throw new AppException(ErrorCode.NOTFOUND_DATA);
+            } catch (Exception e) {
+                log.error("Book repository error: ", e);
+                throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+            }
+            TaskSchedulerConfig.PRODUCT_UPDATE.add(detail.getId());
         }
 
         detail.setBookSize(Book.getBookSize(detail.getSize()));
-        detail.setSize(null);
+        detail.setChildImages(List.of(detail.getOtherImage().split(" \\| ")));
+        detail.setOtherImage(null);
         return detail;
     }
 

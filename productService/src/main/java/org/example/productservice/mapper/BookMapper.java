@@ -2,6 +2,7 @@ package org.example.productservice.mapper;
 
 import org.example.productservice.dto.request.BookCreationRequest;
 import org.example.productservice.dto.response.DetailInternal;
+import org.example.productservice.dto.response.ManagerBookDetailResponse;
 import org.example.productservice.dto.response.QuantityBookAfterMinusResponse;
 import org.example.productservice.entity.Book;
 import org.mapstruct.Mapper;
@@ -15,4 +16,6 @@ public interface BookMapper {
 
     @Mapping(target = "bookId", source = "id")
     QuantityBookAfterMinusResponse toQuantityBookAfterMinusResponse(DetailInternal detailInternal);
+
+    ManagerBookDetailResponse toManagerBookDetailResponse(Book book);
 }

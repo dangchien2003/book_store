@@ -28,7 +28,8 @@ public class TaskSchedulerConfig {
 
     public static final Set<Long> PRODUCT_UPDATE = Collections.synchronizedSet(new LinkedHashSet<>());
 
-    @Scheduled(cron = "* */5 * * * *")
+    //    @Scheduled(cron = "* */5 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void taskUpdateProduct() {
 
         if (PRODUCT_UPDATE.isEmpty()) {
@@ -64,7 +65,11 @@ public class TaskSchedulerConfig {
         for (int i = 0; i < queue.size(); i++) {
             Callable<Boolean> callable = () -> {
                 Book book = queue.poll();
-                String key = PrefixCache.BOOK.getValue() + book.getId();
+                if (book == null) {
+                    return true;
+                }
+
+                String key = PrefixCache.BOOK_.name() + book.getId();
 
                 redisService.delete(key);
                 redisService.save(key, book);
@@ -80,6 +85,16 @@ public class TaskSchedulerConfig {
             futures.add(future);
         }
 
+        boolean putAllSuccess = runResult(futures);
+
+        if (putAllSuccess) {
+            log.info("Cache sản phẩm thành công");
+        } else {
+            log.warn("Cache sản phẩm thất bại");
+        }
+    }
+
+    boolean runResult(List<Future<Boolean>> futures) {
         boolean putAllSuccess = true;
         for (Future<Boolean> future : futures) {
             try {
@@ -93,10 +108,6 @@ public class TaskSchedulerConfig {
             }
         }
 
-        if (putAllSuccess) {
-            log.info("Cache sản phẩm thành công");
-        } else {
-            log.warn("Cache sản phẩm thất bại");
-        }
+        return putAllSuccess;
     }
 }
