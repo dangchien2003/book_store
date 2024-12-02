@@ -92,8 +92,8 @@ public class VnPayServiceImpl implements VnPayService {
         String vnpOrderInfo = "Kiem tra ket qua GD OrderId:" + vnpTxnRef;
 
         Transaction transaction = getTransaction(vnpTxnRef);
-//        if (transaction.getStatus().equals(TransactionStatus.SUCCESS.name()))
-
+        if (transaction.getStatus().equals(TransactionStatus.SUCCESS.name()))
+            throw new AppException(ErrorCode.TRANSACTION_VERIFIED);
 
         String vnpCreateDate = TimeUtils.convertTimestampToString(transaction.getCreatedAt(), "yyyyMMddHHmmss");
 
@@ -118,7 +118,11 @@ public class VnPayServiceImpl implements VnPayService {
         if (response.getVnpTransactionStatus() == null ||
                 !response.getVnpTransactionStatus().equals("00") ||
                 !response.getVnpResponseCode().equals("00")) {
-            throw new AppException(ErrorCode.CUSTOM_MESSAGE);
+            if (transactionRepository.updateStatus(vnpTxnRef, TransactionStatus.ERROR, Instant.now().toEpochMilli()) != 1) {
+                log.error("update status error fail for transaction: " + vnpTxnRef);
+                throw new AppException(ErrorCode.UPDATE_STATUS_FAIL);
+            }
+            throw new AppException(ErrorCode.TRANSACTION_ERROR);
         }
 
         if (transactionRepository.updateStatus(vnpTxnRef, TransactionStatus.SUCCESS, Instant.now().toEpochMilli()) != 1) {
@@ -159,7 +163,6 @@ public class VnPayServiceImpl implements VnPayService {
         if (receivedHash == null) {
             return false;
         }
-
         flatParams.remove("vnp_SecureHash");
 
         List<String> keys = new ArrayList<>(flatParams.keySet());
@@ -172,7 +175,7 @@ public class VnPayServiceImpl implements VnPayService {
             data.append(key).append("=").append(flatParams.get(key));
         }
 
-        String calculatedHash = VNPAYConfig.hmacSHA512(data.toString(), secretKey);
+        String calculatedHash = VNPAYConfig.hmacSHA512(secretKey, data.toString());
 
         return receivedHash.equalsIgnoreCase(calculatedHash);
     }

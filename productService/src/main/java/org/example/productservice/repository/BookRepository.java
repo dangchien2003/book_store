@@ -4,6 +4,7 @@ import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -23,4 +24,6 @@ public interface BookRepository {
     List<DetailInternal> getListDetail(List<Long> bookIds) throws Exception;
 
     int updateQuantity(List<QuantityBookAfterMinusResponse> data, List<Long> ids);
+
+    List<Book> findAllById(Collection<Long> ids) throws Exception;
 }

@@ -1,5 +1,6 @@
 package org.example.productservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.StringJoiner;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book extends EntityWithTimestamps {
     Long id;
     String name;
@@ -37,7 +39,6 @@ public class Book extends EntityWithTimestamps {
     static String[] sizeOrder = {"width", "wide", "height"};
 
     public void setSize(BookSize bookSize) {
-
         if (bookSize.getWidth() == 0 || bookSize.getWide() == 0 || bookSize.getHeight() == 0)
             throw new AppException(ErrorCode.INVALID_DATA);
 
@@ -87,5 +88,13 @@ public class Book extends EntityWithTimestamps {
         }
 
         return bookSize;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }

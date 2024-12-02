@@ -217,4 +217,16 @@ public class BookRepositoryImpl implements BookRepository {
 
         return jdbcTemplate.update(sql.toString(), params);
     }
+
+    @Override
+    public List<Book> findAllById(Collection<Long> ids) throws Exception {
+        StringBuilder sql = new StringBuilder("SELECT * FROM book WHERE id IN ");
+        StringJoiner param = new StringJoiner(",", "(", ")");
+        for (int i = 0; i < ids.size(); i++) {
+            param.add("?");
+        }
+        sql.append(param);
+
+        return MapperUtils.mappingManyElement(Book.class, jdbcTemplate.queryForList(sql.toString(), ids.toArray()));
+    }
 }

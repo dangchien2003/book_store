@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.example.productservice.configuration.TaskSchedulerConfig;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.request.BookCreationRequest;
 import org.example.productservice.dto.request.BookMinusQuantityRequest;
@@ -20,6 +21,7 @@ import org.example.productservice.repository.BookCategoryRepository;
 import org.example.productservice.repository.BookRepository;
 import org.example.productservice.repository.PublisherRepository;
 import org.example.productservice.service.BookService;
+import org.example.productservice.service.RedisService;
 import org.example.productservice.utils.ENumUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class BookServiceImpl implements BookService {
     AuthorRepository authorRepository;
     PublisherRepository publisherRepository;
     BookCategoryRepository bookCategoryRepository;
+    RedisService redisService;
     BookMapper bookMapper;
 
     static final int PAGE_SIZE_FOR_MANAGER_FIND = 2;
@@ -62,6 +65,9 @@ public class BookServiceImpl implements BookService {
         Long id = bookRepository.create(book);
         if (Objects.isNull(id))
             throw new AppException(ErrorCode.UPDATE_FAIL);
+
+        // add queue
+        TaskSchedulerConfig.PRODUCT_UPDATE.add(id);
 
         return BookCreationResponse.builder()
                 .id(id)

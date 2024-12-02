@@ -36,6 +36,8 @@ public enum ErrorCode {
     VALIDATE_INFO_PAYMENT_ERROR(5030, "Payment failed", HttpStatus.BAD_REQUEST),
     PAYMENT_SUCCESS_BUT_UPDATE_STATUS_FAIL(5031, "Transaction was successful but status update failed", HttpStatus.INTERNAL_SERVER_ERROR),
     ERROR_CALL_TO_ORDER_CLIENT(5032, "An error occurred, we will process it within 1 hour at the latest", HttpStatus.INTERNAL_SERVER_ERROR),
+    TRANSACTION_VERIFIED(5033, "Transaction has been confirmed", HttpStatus.BAD_REQUEST),
+    TRANSACTION_ERROR(5034, "Payment failed", HttpStatus.BAD_REQUEST),
 
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
