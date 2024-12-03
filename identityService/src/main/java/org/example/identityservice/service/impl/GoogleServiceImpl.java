@@ -1,5 +1,7 @@
 package org.example.identityservice.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.identityservice.dto.request.GoogleAccessTokenRequest;
 import org.example.identityservice.dto.request.GoogleAuthenticationRequest;
 import org.example.identityservice.dto.request.UserCreationRequest;
-import org.example.identityservice.dto.response.AuthenticationResponse;
-import org.example.identityservice.dto.response.GoogleAccessTokenResponse;
-import org.example.identityservice.dto.response.GoogleUserProfileResponse;
-import org.example.identityservice.dto.response.UserCreationResponse;
+import org.example.identityservice.dto.response.*;
 import org.example.identityservice.entity.User;
 import org.example.identityservice.exception.AppException;
 import org.example.identityservice.exception.ErrorCode;
@@ -34,6 +33,7 @@ public class GoogleServiceImpl implements GoogleService {
     UserRepository userRepository;
     GoogleProfileClient googleProfileClient;
     GoogleTokenClient googleTokenClient;
+    ObjectMapper objectMapper;
 
 
     @NonFinal
@@ -93,8 +93,9 @@ public class GoogleServiceImpl implements GoogleService {
         UserUtils.validateStatusUser(user);
 
         try {
-            return UserUtils.createAuthenticationResponse(user, userAgent, secretKey, timeLiveAccessToken, timeLiveRefreshToken);
-        } catch (JOSEException e) {
+            String refreshTokenClaimSet = objectMapper.writeValueAsString(new RefreshTokenClaimSet(user.getUid(), userAgent));
+            return UserUtils.createAuthenticationResponse(user, refreshTokenClaimSet, secretKey, timeLiveAccessToken, timeLiveRefreshToken);
+        } catch (JOSEException | JsonProcessingException e) {
             log.error("Authentication error:", e);
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }

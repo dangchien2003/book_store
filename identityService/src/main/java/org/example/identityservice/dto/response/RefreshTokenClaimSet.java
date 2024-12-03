@@ -3,13 +3,12 @@ package org.example.identityservice.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RefreshTokenResponse {
-
-    String token;
+public class RefreshTokenClaimSet {
+    String uid;
+    String ua;
 }

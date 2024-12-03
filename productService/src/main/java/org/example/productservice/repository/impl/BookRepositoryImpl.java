@@ -229,4 +229,10 @@ public class BookRepositoryImpl implements BookRepository {
 
         return MapperUtils.mappingManyElement(Book.class, jdbcTemplate.queryForList(sql.toString(), ids.toArray()));
     }
+
+    @Override
+    public List<Book> findAll() throws Exception {
+        String sql = "SELECT * from book";
+        return MapperUtils.mappingManyElement(Book.class, jdbcTemplate.queryForList(sql));
+    }
 }

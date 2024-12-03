@@ -22,11 +22,10 @@ public class UserUtils {
     }
 
     public static String genAccessToken(User user, int timeLive, String secretKey) throws JOSEException {
-
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUid() + "*" + (user.getRole().isManager() ? "1" : "0"))
+                .subject(user.getUid())
                 .issuer("book_store")
                 .issueTime(new Date())
                 .expirationTime(new Date(
@@ -43,12 +42,33 @@ public class UserUtils {
         return jwsObject.serialize();
     }
 
-    public static String genRefreshToken(String userAgent, int timeLive, String secretKey) throws JOSEException {
+    public static String genAccessToken(String subject, String scope, int timeLive, String secretKey) throws JOSEException {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(subject)
+                .issuer("book_store")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli()
+                ))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("scope", scope)
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+        jwsObject.sign(new MACSigner(secretKey.getBytes()));
+
+        return jwsObject.serialize();
+    }
+
+    public static String genRefreshToken(String refreshClaimSet, int timeLive, String secretKey) throws JOSEException {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(userAgent)
+                .subject(refreshClaimSet)
                 .issuer("book_store")
                 .issueTime(new Date())
                 .expirationTime(new Date(
@@ -65,10 +85,10 @@ public class UserUtils {
 
     }
 
-    public static AuthenticationResponse createAuthenticationResponse(User user, String userAgent, String secretKey, int timeLiveAccessToken, int timeLiveRefreshToken) throws JOSEException {
+    public static AuthenticationResponse createAuthenticationResponse(User user, String refreshClaimSet, String secretKey, int timeLiveAccessToken, int timeLiveRefreshToken) throws JOSEException {
         return AuthenticationResponse.builder()
                 .accessToken(genAccessToken(user, timeLiveAccessToken, secretKey))
-                .refreshToken(genRefreshToken(userAgent, timeLiveRefreshToken, secretKey))
+                .refreshToken(genRefreshToken(refreshClaimSet, timeLiveRefreshToken, secretKey))
                 .expire(timeLiveAccessToken * 60)
                 .manager(identifyManager(user))
                 .build();

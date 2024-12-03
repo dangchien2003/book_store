@@ -26,4 +26,6 @@ public interface BookRepository {
     int updateQuantity(List<QuantityBookAfterMinusResponse> data, List<Long> ids);
 
     List<Book> findAllById(Collection<Long> ids) throws Exception;
+
+    List<Book> findAll() throws Exception;
 }

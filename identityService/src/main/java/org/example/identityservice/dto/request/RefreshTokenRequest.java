@@ -13,5 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class RefreshTokenRequest {
 
     @NotBlank(message = "FIELD_INFORMATION_MISSING")
-    String token;
+    String refreshToken;
+    @NotBlank(message = "FIELD_INFORMATION_MISSING")
+    String accessToken;
 }

@@ -13,5 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class LogoutRequest {
 
     @NotBlank(message = "INVALID_TOKEN")
-    String token;
+    String refreshToken;
+    @NotBlank(message = "INVALID_TOKEN")
+    String accessToken;
 }

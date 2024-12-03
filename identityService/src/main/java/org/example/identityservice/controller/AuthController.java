@@ -5,12 +5,11 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.example.identityservice.dto.request.AuthenticationRequest;
-import org.example.identityservice.dto.request.CheckTokenRequest;
-import org.example.identityservice.dto.request.GoogleAuthenticationRequest;
+import org.example.identityservice.dto.request.*;
 import org.example.identityservice.dto.response.ApiResponse;
 import org.example.identityservice.dto.response.AuthenticationResponse;
 import org.example.identityservice.dto.response.CheckTokenResponse;
+import org.example.identityservice.dto.response.RefreshTokenResponse;
 import org.example.identityservice.service.AuthenticationService;
 import org.example.identityservice.service.GoogleService;
 import org.springframework.web.bind.annotation.*;
@@ -49,17 +48,18 @@ public class AuthController {
                 .build();
     }
 
-//    @PostMapping("/logout")
-//    ApiResponse<Void> logout(@Valid @RequestBody LogoutRequest request) {
-//        authenticationService.logout(request);
-//        return ApiResponse.<Void>builder().build();
-//    }
-//
-//    @PostMapping("/refresh")
-//    ApiResponse<RefreshTokenResponse> logout(@Valid @RequestBody RefreshTokenRequest request)
-//            throws JOSEException {
-//        return ApiResponse.<RefreshTokenResponse>builder()
-//                .result(authenticationService.refreshToken(request))
-//                .build();
-//    }
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<RefreshTokenResponse> logout(
+            @RequestHeader("User-Agent") String userAgent,
+            @Valid @RequestBody RefreshTokenRequest request) {
+        return ApiResponse.<RefreshTokenResponse>builder()
+                .result(authenticationService.refreshToken(request, userAgent))
+                .build();
+    }
 }

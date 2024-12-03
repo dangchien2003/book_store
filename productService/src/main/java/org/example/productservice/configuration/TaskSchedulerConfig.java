@@ -28,8 +28,7 @@ public class TaskSchedulerConfig {
 
     public static final Set<Long> PRODUCT_UPDATE = Collections.synchronizedSet(new LinkedHashSet<>());
 
-    //    @Scheduled(cron = "* */5 * * * *")
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "* */5 * * * *")
     public void taskUpdateProduct() {
 
         if (PRODUCT_UPDATE.isEmpty()) {
@@ -57,7 +56,7 @@ public class TaskSchedulerConfig {
     }
 
     void putRelated(Queue<Book> queue) {
-
+        
     }
 
     void putProduct(Queue<Book> queue) {
