@@ -1,19 +1,27 @@
-import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import SignUpForm from './SignUpForm'
 import Logo from '@/components/Logo'
 import { Stack } from '@mui/material'
 import { Link } from 'react-router-dom'
+import background from '@/assets/image/login_background.jpg'
 
 const SignUp = () => {
   return (
-    <Container maxWidth='xs' sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '10px 0' }
-    }>
+    <Box sx={{
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center', padding: '10px 0', backgroundImage: `url(${background})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }} >
       <Box sx={{
-        width: '100%',
         height: 500,
+        maxWidth: '300px',
         minHeight: '500',
-        boxShadow: '0 0 10px rgb(182, 180, 180);'
+        boxShadow: '0 0 10px rgb(182, 180, 180);',
+        backgroundColor: 'white'
       }} m={2} px={5}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }} pt={4} pb={1}>
           <Logo />
@@ -23,7 +31,7 @@ const SignUp = () => {
         </Stack>
         <SignUpForm />
       </Box>
-    </Container >
+    </Box >
   )
 }
 

@@ -5,6 +5,8 @@ import LayoutAdmin from './components/Manager/layout'
 import AddBook from './pages/admin/ProductManager/AddBook'
 import BookList from './pages/admin/ProductManager/BookList'
 import BookDetail from './pages/admin/ProductManager/BookDetail'
+import Home from './pages/customer/Home'
+import LayoutCustomer from './pages/customer/LayoutCustomer'
 
 
 function App() {
@@ -18,6 +20,9 @@ function App() {
           <Route path='book/add' element={<AddBook />} />
           <Route path='book/detail/:id' element={<BookDetail />} />
           {/* <Route path='account' element={<AccountManager />} /> */}
+        </Route>
+        <Route path='/store' element={<LayoutCustomer />} >
+          <Route path='home' element={<Home />} />
         </Route>
         <Route path='/*' element={<SignIn />} />
       </Routes>

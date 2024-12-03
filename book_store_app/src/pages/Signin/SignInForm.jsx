@@ -13,6 +13,7 @@ import { messageError } from '@/configs/messageError'
 import { ToastContainer } from 'react-toastify'
 import { toastError } from '@/utils/toast'
 
+
 const SignInForm = () => {
   const [username, setUsername] = useState(getRememberUsername())
   const [password, setPassword] = useState('')
@@ -40,7 +41,7 @@ const SignInForm = () => {
       if (response.data.result.manager)
         navigate('/manager')
       else
-        navigate('/')
+        navigate('/store/home')
     }).catch((error) => {
       toastError(error.response.data ? messageError[error.response.data.code] : error.response.data.message)
     })
@@ -52,7 +53,7 @@ const SignInForm = () => {
 
 
   return (
-    <Box pt={2}>
+    <Box pt={2} >
       <ToastContainer />
       <Stack gap={1} >
         <TextField
