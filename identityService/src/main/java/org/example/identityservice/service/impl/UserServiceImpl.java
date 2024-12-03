@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.example.event.CreateAccountSuccess;
 import org.example.identityservice.dto.request.UserCreationRequest;
 import org.example.identityservice.dto.response.UserCreationResponse;
 import org.example.identityservice.entity.Role;
@@ -14,6 +15,7 @@ import org.example.identityservice.exception.ErrorCode;
 import org.example.identityservice.mapper.UserMapper;
 import org.example.identityservice.repository.RoleRepository;
 import org.example.identityservice.repository.UserRepository;
+import org.example.identityservice.service.KafkaService;
 import org.example.identityservice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     UserMapper usersMapper;
+    KafkaService kafkaService;
 
     public UserCreationResponse signUp(UserCreationRequest request, boolean registerByGoogleOAuth2) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -53,5 +56,8 @@ public class UserServiceImpl implements UserService {
         user.setStatusCode(registerByGoogleOAuth2 ? UserStatus.ACTIVE : UserStatus.ACTIVE);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
+        if (user.getCreatedAt() != null) {
+            kafkaService.sendEmail(new CreateAccountSuccess(user.getEmail()));
+        }
     }
 }

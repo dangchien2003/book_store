@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="apiGateway" />
         <module name="identityService" />
         <module name="eureka_service" />
         <module name="paymentService" />
-        <module name="productService" />
         <module name="orderService" />
+        <module name="apiGateway" />
+        <module name="notification-service" />
+        <module name="productService" />
       </profile>
     </annotationProcessing>
   </component>
@@ -21,6 +22,7 @@
       <module name="apiGateway" options="-parameters" />
       <module name="eureka_service" options="-parameters" />
       <module name="identityService" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="orderService" options="-parameters" />
       <module name="paymentService" options="-parameters" />
       <module name="productService" options="-parameters" />
