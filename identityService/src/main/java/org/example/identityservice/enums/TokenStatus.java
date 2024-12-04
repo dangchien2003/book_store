@@ -9,9 +9,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public enum TokenStatus {
-    REJECT("1"),
-    NON_REJECT("0"),
+    REJECT(1),
+    NON_REJECT(0),
     ;
 
-    String status;
+    int status;
+
+    public static TokenStatus fromStatus(int status) {
+        if (status == 0) {
+            return TokenStatus.NON_REJECT;
+        } else {
+            return TokenStatus.REJECT;
+        }
+    }
 }

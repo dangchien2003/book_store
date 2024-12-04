@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.example.identityservice.enums.TokenStatus;
 import org.example.identityservice.enums.TokenType;
+import org.example.identityservice.utils.TokenStatusConverter;
 
 @Entity
 @Builder
@@ -20,7 +21,8 @@ public class Token {
     long expireAt;
     @Enumerated(EnumType.STRING)
     TokenType type;
-    @Column(nullable = false, length = 1, columnDefinition = "CHAR(1) DEFAULT 0")
+    @Column(nullable = false, length = 1)
+    @Convert(converter = TokenStatusConverter.class)
     TokenStatus reject;
 
     public Token() {

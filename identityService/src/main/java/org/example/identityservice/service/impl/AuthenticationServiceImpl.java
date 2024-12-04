@@ -147,6 +147,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
+
     @Override
     public CheckTokenResponse checkToken(CheckTokenRequest request)
             throws JOSEException {

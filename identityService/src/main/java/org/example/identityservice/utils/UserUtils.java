@@ -3,9 +3,13 @@ package org.example.identityservice.utils;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.example.identityservice.configuration.TokenTask;
 import org.example.identityservice.dto.response.AuthenticationResponse;
 import org.example.identityservice.entity.Role;
+import org.example.identityservice.entity.Token;
 import org.example.identityservice.entity.User;
+import org.example.identityservice.enums.TokenStatus;
+import org.example.identityservice.enums.TokenType;
 import org.example.identityservice.exception.AppException;
 import org.example.identityservice.exception.ErrorCode;
 
@@ -24,35 +28,36 @@ public class UserUtils {
     public static String genAccessToken(User user, int timeLive, String secretKey) throws JOSEException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
+        String tokenId = UUID.randomUUID().toString();
+        long expireTime = Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli();
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUid())
                 .issuer("book_store")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli()
-                ))
-                .jwtID(UUID.randomUUID().toString())
-                .claim("scope", buildScope(user))
+                .expirationTime(new Date(expireTime))
+                .jwtID(tokenId)
+                .claim("scope", UserUtils.buildScope(user))
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
 
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT));
         return jwsObject.serialize();
     }
 
     public static String genAccessToken(String subject, String scope, int timeLive, String secretKey) throws JOSEException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
+        String tokenId = UUID.randomUUID().toString();
+        long expireTime = Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli();
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(subject)
                 .issuer("book_store")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli()
-                ))
-                .jwtID(UUID.randomUUID().toString())
+                .expirationTime(new Date(expireTime))
+                .jwtID(tokenId)
                 .claim("scope", scope)
                 .build();
 
@@ -60,6 +65,7 @@ public class UserUtils {
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
 
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT));
         return jwsObject.serialize();
     }
 
@@ -67,6 +73,8 @@ public class UserUtils {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
+        String tokenId = UUID.randomUUID().toString();
+        long expireTime = Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli();
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(refreshClaimSet)
                 .issuer("book_store")
@@ -78,9 +86,9 @@ public class UserUtils {
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
-
-
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
+        System.out.println(tokenId);
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.REFRESH_TOKEN, TokenStatus.NON_REJECT));
         return jwsObject.serialize();
 
     }
@@ -90,7 +98,7 @@ public class UserUtils {
                 .accessToken(genAccessToken(user, timeLiveAccessToken, secretKey))
                 .refreshToken(genRefreshToken(refreshClaimSet, timeLiveRefreshToken, secretKey))
                 .expire(timeLiveAccessToken * 60)
-                .manager(identifyManager(user))
+                .manager(UserUtils.identifyManager(user))
                 .build();
     }
 
@@ -104,7 +112,7 @@ public class UserUtils {
         return isManager;
     }
 
-    public static String buildScope(User user) {
+    static String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         Role role = user.getRole();
         if (!Objects.isNull(user.getRole())) {
