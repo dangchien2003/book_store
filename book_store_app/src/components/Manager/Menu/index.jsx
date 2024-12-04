@@ -12,7 +12,22 @@ export default function SidebarMenu() {
   }
 
   return (
-    <Box sx={{ height: '100vh', width: '20%', border: '1px solid black' }}>
+    <Box sx={{
+      height: {
+        lg: '100vh',
+        xs: 'auto'
+      },
+      width: {
+        lg: '20%',
+        xs: '100vw'
+      },
+      backgroundColor: {
+        xs: '#f0f0f0'
+      },
+      borderRadius: {
+        xs: '0 0 10px 10px'
+      }
+    }}>
       <List component='nav' >
         {menuData.map((item, index) => (
           <Box key={item.title}>

@@ -10,7 +10,8 @@ const SignIn = () => {
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center', padding: '10px 0', backgroundImage: `url(${background})`,
+      alignItems: 'center', padding: '10px 0',
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(${background})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'

@@ -80,7 +80,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new AppException(ErrorCode.NO_ACCESS);
             }
 
-            // inject token
             if (access.getJWTClaimsSet().getExpirationTime().toInstant().toEpochMilli() > Instant.now().toEpochMilli()) {
                 logout(new LogoutRequest(null, request.getAccessToken()));
             }

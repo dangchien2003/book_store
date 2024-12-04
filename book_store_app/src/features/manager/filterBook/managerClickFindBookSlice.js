@@ -21,7 +21,7 @@ export const incrementWithTimeout = () => (dispatch) => {
   dispatch(setFinding())
   setTimeout(() => {
     dispatch(reset())
-  }, 1000)
+  }, 2000)
 }
 
 export default managerClickFindBook.reducer

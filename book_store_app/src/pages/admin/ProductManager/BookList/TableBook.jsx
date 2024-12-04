@@ -31,7 +31,7 @@ const genStatus = (statusId) => {
   return format ? <Chip label={format.text} color={format.color} /> : <Chip label={statusId} color='warning' />
 }
 let maxPage = null
-let backPage = false
+let callAllow = true
 const TableBook = () => {
   const [rows, setRows] = useState([])
   const [page, setPage] = useState(1)
@@ -40,12 +40,6 @@ const TableBook = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-
-    if (backPage) {
-      backPage = false
-      return
-    }
-
     getBooks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
@@ -64,20 +58,26 @@ const TableBook = () => {
   }, [finding])
 
   const getBooks = () => {
+    // chặn call api và thay đổi lại giá trị
+    if (!callAllow) {
+      callAllow = true
+      return
+    }
+
     getAllBook(page, filter)
       .then(response => {
         if (response.data.result.length > 0) {
           setRows(response.data.result)
         } else if (page === 1) {
-          toastInfo('Không có dữ liệu');
+          toastInfo('Không có dữ liệu')
+          setRows([])
+          maxPage = 1
         } else {
-          toastInfo('Đã đến trang cuối');
-        }
-
-        if (!finding) {
-          setPage(pre => pre - 1)
+          toastInfo('Đã đến trang cuối')
           maxPage = page - 1
-          backPage = true
+          setPage(pre => pre - 1)
+          // ngăn chặn call lại khi thay đổi page
+          callAllow = false
         }
       })
       .catch(() => {
@@ -105,7 +105,10 @@ const TableBook = () => {
   return (
     <Paper sx={{ width: '100%', mt: '10px' }}>
       <TableContainer component={Paper} sx={{ maxHeight: '500px' }}>
-        <Table sx={{ minWidth: 650, overflow: 'scroll' }} aria-label="list book">
+        <Table sx={{
+          minWidth: '650px',
+          overflow: 'scroll'
+        }} aria-label="list book">
           <TableHead sx={{ backgroundColor: '#ffff', position: 'sticky', top: 0, zIndex: 1 }}>
             <TableRow sx={{
               '& .MuiTableCell-root': {
