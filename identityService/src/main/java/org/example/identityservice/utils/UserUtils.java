@@ -82,12 +82,11 @@ public class UserUtils {
                 .expirationTime(new Date(
                         Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli()
                 ))
-                .jwtID(UUID.randomUUID().toString())
+                .jwtID(tokenId)
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
-        System.out.println(tokenId);
         TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.REFRESH_TOKEN, TokenStatus.NON_REJECT));
         return jwsObject.serialize();
 
