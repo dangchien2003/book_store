@@ -65,11 +65,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request, String userAgent) {
         String newAccessToken;
+        String uidInAccess;
         try {
             SignedJWT access = getTokenData(request.getAccessToken());
             SignedJWT refresh = verifyToken(request.getRefreshToken());
 
-            String uidInAccess = access.getJWTClaimsSet().getSubject();
+            uidInAccess = access.getJWTClaimsSet().getSubject();
             String scope = access.getJWTClaimsSet().getClaim("scope").toString();
             RefreshTokenClaimSet refreshTokenClaimSet = objectMapper.readValue(refresh.getJWTClaimsSet().getSubject(), RefreshTokenClaimSet.class);
 

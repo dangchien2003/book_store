@@ -24,6 +24,8 @@ public class Token {
     @Column(nullable = false, length = 1)
     @Convert(converter = TokenStatusConverter.class)
     TokenStatus reject;
+    @Column(nullable = false)
+    String uid;
 
     public Token() {
         this.reject = TokenStatus.NON_REJECT;

@@ -43,17 +43,17 @@ public class UserUtils {
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
 
-        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT));
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT, user.getUid()));
         return jwsObject.serialize();
     }
 
-    public static String genAccessToken(String subject, String scope, int timeLive, String secretKey) throws JOSEException {
+    public static String genAccessToken(String uid, String scope, int timeLive, String secretKey) throws JOSEException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         String tokenId = UUID.randomUUID().toString();
         long expireTime = Instant.now().plus(timeLive, ChronoUnit.MINUTES).toEpochMilli();
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(subject)
+                .subject(uid)
                 .issuer("book_store")
                 .issueTime(new Date())
                 .expirationTime(new Date(expireTime))
@@ -65,11 +65,11 @@ public class UserUtils {
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
 
-        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT));
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.ACCESS_TOKEN, TokenStatus.NON_REJECT, uid));
         return jwsObject.serialize();
     }
 
-    public static String genRefreshToken(String refreshClaimSet, int timeLive, String secretKey) throws JOSEException {
+    public static String genRefreshToken(String uid, String refreshClaimSet, int timeLive, String secretKey) throws JOSEException {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -87,7 +87,7 @@ public class UserUtils {
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
         jwsObject.sign(new MACSigner(secretKey.getBytes()));
-        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.REFRESH_TOKEN, TokenStatus.NON_REJECT));
+        TokenTask.TOKEN_SAVE.add(new Token(tokenId, expireTime, TokenType.REFRESH_TOKEN, TokenStatus.NON_REJECT, uid));
         return jwsObject.serialize();
 
     }
@@ -95,7 +95,7 @@ public class UserUtils {
     public static AuthenticationResponse createAuthenticationResponse(User user, String refreshClaimSet, String secretKey, int timeLiveAccessToken, int timeLiveRefreshToken) throws JOSEException {
         return AuthenticationResponse.builder()
                 .accessToken(genAccessToken(user, timeLiveAccessToken, secretKey))
-                .refreshToken(genRefreshToken(refreshClaimSet, timeLiveRefreshToken, secretKey))
+                .refreshToken(genRefreshToken(user.getUid(), refreshClaimSet, timeLiveRefreshToken, secretKey))
                 .expire(timeLiveAccessToken * 60)
                 .manager(UserUtils.identifyManager(user))
                 .build();
