@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class IntrospectResponse {
+public class CheckTokenResponse {
     boolean valid;
+    String user;
 }

@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class CheckTokenResponse {
     boolean valid;
+    String user;
 }

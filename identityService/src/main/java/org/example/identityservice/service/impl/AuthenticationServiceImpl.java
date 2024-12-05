@@ -160,15 +160,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throws JOSEException {
 
         boolean isValid = true;
-
+        String user = null;
         try {
-            verifyToken(request.getToken());
+            SignedJWT signedJWT = verifyToken(request.getToken());
+            user = signedJWT.getJWTClaimsSet().getSubject();
         } catch (AppException | ParseException e) {
             isValid = false;
         }
 
         return CheckTokenResponse.builder()
                 .valid(isValid)
+                .user(user)
                 .build();
     }
 

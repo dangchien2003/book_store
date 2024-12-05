@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apigateway.dto.response.ApiResponse;
-import org.example.apigateway.dto.response.IntrospectResponse;
+import org.example.apigateway.dto.response.CheckTokenResponse;
 import org.example.apigateway.exception.AppException;
 import org.example.apigateway.exception.ErrorCode;
 import org.example.apigateway.service.IdentityService;
@@ -43,6 +43,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/auth/sign-in",
             "/identity/auth/logout",
             "/identity/auth/refresh",
+            "/identity/auth/check-token",
             "/identity/auth/google/verify",
             "/identity/users/sign-up",
             "/identity/users/register/google",
@@ -63,12 +64,17 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         String token = authHeader.get(0).replace("Bearer ", "");
 
-        Mono<ApiResponse<IntrospectResponse>> result = identityService.checkToken(token);
+        Mono<ApiResponse<CheckTokenResponse>> result = identityService.checkToken(token);
 
         return result.flatMap(introspectResponseApiResponse -> {
-            if (introspectResponseApiResponse.getResult().isValid())
-                return chain.filter(exchange);
-            else
+            if (introspectResponseApiResponse.getResult().isValid()) {
+                String user = introspectResponseApiResponse.getResult().getUser();
+                ServerHttpRequest modifiedRequest = exchange.getRequest()
+                        .mutate()
+                        .header("user", user)
+                        .build();
+                return chain.filter(exchange.mutate().request(modifiedRequest).build());
+            } else
                 throw new AppException(ErrorCode.UNAUTHENTICATED);
         }).onErrorResume(throwable -> {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
