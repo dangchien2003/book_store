@@ -1,4 +1,3 @@
-const accessTokenKey = 'access'
 const rememberKey = 'remember'
 
 function setCookie(name, value, seconds) {
@@ -35,13 +34,4 @@ export function getRememberUsername() {
 
 export function deleteRememberUsername() {
   deleteCookie(rememberKey)
-}
-
-
-export function setAccessToken(value, seconds) {
-  setCookie(accessTokenKey, value, seconds)
-}
-
-export function getAccessToken() {
-
 }

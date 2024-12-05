@@ -3,8 +3,13 @@ import SignInForm from './SignInForm'
 import Logo from '@/components/Logo'
 import AuthActions from './AuthActions'
 import background from '@/assets/image/login_background.jpg'
+import { deleteAccessToken, deleteRefeshToken } from '@/services/localStorageService'
 
 const SignIn = () => {
+
+  deleteAccessToken()
+  deleteRefeshToken()
+
   return (
     <Box sx={{
       minHeight: '100vh',

@@ -1,6 +1,5 @@
 import Logo from '@/components/Logo'
 import { Box, Container, Grid } from '@mui/material'
-import React from 'react'
 import Search from './Search'
 
 const Header = () => {

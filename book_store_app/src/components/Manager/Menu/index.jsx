@@ -13,7 +13,7 @@ export default function SidebarMenu() {
 
   return (
     <Box sx={{
-      height: {
+      minHeight: {
         lg: '100vh',
         xs: 'auto'
       },
@@ -36,7 +36,7 @@ export default function SidebarMenu() {
               {open === index ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={open === index} timeout='auto' unmountOnExit sx={open === index ? { backgroundColor: 'black' } : undefined}>
-              <List component='div' disablePadding sx={{ background: open === index ? '#f1f1f3' : 'transparent' }}>
+              <List component='div' disablePadding sx={{ background: open === index ? '#f6f6f7' : 'transparent' }}>
                 {item.children.map((subItem, index) => (
                   <Link key={index} to={subItem.link} style={{ textDecoration: 'none' }}>
                     <ListItemButton sx={{ pl: 4 }}>

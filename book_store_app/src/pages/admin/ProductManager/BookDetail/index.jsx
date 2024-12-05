@@ -1,11 +1,11 @@
 import { Box, Grid } from '@mui/material'
-import { useParams } from 'react-router-dom'
+// import { useParams } from 'react-router-dom'
 import UploadMainImage from './UploadMainImage'
 import UploadChildImage from './UploadChilden'
 import Detail from './Detail'
 
 const BookDetail = () => {
-  const { id } = useParams()
+  // const { id } = useParams()
 
   return (
     <Grid container >

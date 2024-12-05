@@ -41,12 +41,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     String[] publicEndpoints = {
             "/identity/auth/sign-in",
+            "/identity/auth/logout",
+            "/identity/auth/refresh",
             "/identity/auth/google/verify",
             "/identity/users/sign-up",
             "/identity/users/register/google",
-
-            "/product/.*",
-            "/.*"
     };
 
     @Override

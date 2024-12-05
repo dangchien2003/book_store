@@ -114,16 +114,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    Token genTokenBlackList(String token, TokenType tokenType) throws ParseException, JOSEException {
-        SignedJWT jwt = null;
-        jwt = verifyToken(token);
+    Token genTokenBlackList(String token, TokenType tokenType) throws ParseException, JOSEException, JsonProcessingException {
+        SignedJWT jwt = verifyToken(token);
         long expire = jwt.getJWTClaimsSet().getExpirationTime().toInstant().toEpochMilli();
         String id = jwt.getJWTClaimsSet().getJWTID();
+        String subject = jwt.getJWTClaimsSet().getSubject();
+        String uid = subject;
+        if (tokenType.equals(TokenType.REFRESH_TOKEN)) {
+            RefreshTokenClaimSet refreshTokenClaimSet = objectMapper.readValue(subject, RefreshTokenClaimSet.class);
+            uid = refreshTokenClaimSet.getUid();
+        }
+
         return Token.builder()
                 .tokenId(id)
                 .type(tokenType)
                 .expireAt(expire)
                 .reject(TokenStatus.REJECT)
+                .uid(uid)
                 .build();
     }
 

@@ -42,8 +42,8 @@ springdoc:
     tagsSorter: alpha
 
 token:
-  time-live-access-token: 1
-  time-live-refresh-token: 10
+  time-live-access-token: 2
+  time-live-refresh-token: 1000000
   secret-key: ${SECRET_KEY}
 
 eureka:

@@ -4,16 +4,32 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import { Box } from '@mui/material'
+import { logoutAccount } from '@/services/authService/authService'
+import { getAccessToken, getRefeshToken } from '@/services/localStorageService'
+import { toastError } from '@/utils/toast'
+import { messageError } from '@/configs/messageError'
+import { useNavigate } from 'react-router-dom'
 
 function AvatarMenu() {
   const [anchorEl, setAnchorEl] = useState(null)
+  const navigate = useNavigate()
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleClose = () => {
-    setAnchorEl(null)
+  const handleClose = (event) => {
+    setAnchorEl(!event.currentTarget)
+  }
+
+  const handleLogout = () => {
+    const refresh = getRefeshToken()
+    const access = getAccessToken()
+    logoutAccount(access, refresh).catch((error) => {
+      toastError(error.response.data ? messageError[error.response.data.code] : error.response.data.message)
+    }).finally(() => {
+      navigate('/login')
+    })
   }
 
   return (
@@ -41,7 +57,7 @@ function AvatarMenu() {
         }}
       >
         <MenuItem onClick={handleClose}>Tài khoản</MenuItem>
-        <MenuItem onClick={handleClose}>Đăng xuất</MenuItem>
+        <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
       </Menu>
     </Box>
   )

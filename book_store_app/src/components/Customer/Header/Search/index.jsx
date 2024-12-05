@@ -1,5 +1,5 @@
-import { SearchOutlined } from "@mui/icons-material"
-import { Box, Button } from "@mui/material"
+import { SearchOutlined } from '@mui/icons-material'
+import { Box, Button } from '@mui/material'
 
 const Search = () => {
   return (
@@ -15,9 +15,9 @@ const Search = () => {
         borderRadius: '10px',
         padding: '4px'
       }}>
-        <input type="text" placeholder="Bạn muốn mua sách gì?"
+        <input type='text' placeholder='Bạn muốn mua sách gì?'
           style={{ width: '85%', border: 'none', outline: 'none', fontSize: '16px', padding: '0 8px' }} />
-        <Button variant="contained" sx={{ background: '#fe763e', width: '15%' }}>
+        <Button variant='contained' sx={{ background: '#fe763e', width: '15%' }}>
           <SearchOutlined />
         </Button>
       </Box>
