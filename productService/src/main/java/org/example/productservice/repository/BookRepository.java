@@ -28,4 +28,6 @@ public interface BookRepository {
     List<Book> findAllById(Collection<Long> ids) throws Exception;
 
     List<Book> findAll() throws Exception;
+
+    int updateBookDetail(Book data);
 }

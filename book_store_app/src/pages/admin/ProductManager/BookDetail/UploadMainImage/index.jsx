@@ -5,6 +5,7 @@ import upload from '@/assets/image/upload.png'
 const UploadMainImage = () => {
 
   const handleClickUpload = () => {
+    alert('upload main image')
   }
 
   return (

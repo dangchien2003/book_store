@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookUpdateRequest {
+    long id;
+
     @NotBlank(message = "DATA_BLANK")
     String name;
 
@@ -25,9 +27,6 @@ public class BookUpdateRequest {
     @Min(value = 1, message = "Price must be greater than 1")
     int price;
 
-    @Min(value = 1, message = "Cost price must be greater than 1")
-    int costPrice;
-
     @Min(value = 0, message = "Discount must be greater than 0")
     @Max(value = 100, message = "Discount must be less than 100")
     int discount;
@@ -38,7 +37,7 @@ public class BookUpdateRequest {
     @Min(value = 0, message = "Page count must be greater than 0")
     int availableQuantity;
 
-    BookSize size;
+    BookSize bookSize;
 
     Integer publisherId;
     Long authorId;

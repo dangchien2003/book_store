@@ -4,7 +4,7 @@ import buttonUpload from '@/assets/image/plus.png'
 const UploadChildImage = () => {
 
   const handleClickUpload = () => {
-    console.log('upload cj')
+    alert('upload child image')
   }
 
   return (

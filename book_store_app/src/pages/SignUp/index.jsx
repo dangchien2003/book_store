@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import background from '@/assets/image/login_background.jpg'
 
 const SignUp = () => {
+
   return (
     <Box sx={{
       minHeight: '100vh',
@@ -21,7 +22,8 @@ const SignUp = () => {
         maxWidth: '300px',
         minHeight: '500',
         boxShadow: '0 0 10px rgb(182, 180, 180);',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        borderRadius: '10px'
       }} m={2} px={5}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }} pt={4} pb={1}>
           <Logo />

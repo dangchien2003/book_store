@@ -3,7 +3,7 @@ import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Ta
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getAllBook } from '@/services/productService/bookService'
-import { toastError, toastInfo } from '@/utils/toast'
+import { toastInfo } from '@/utils/toast'
 import { useNavigate } from 'react-router-dom'
 
 const statusTemplate = {
@@ -81,7 +81,6 @@ const TableBook = () => {
         }
       })
       .catch(() => {
-        toastError('Lỗi không mong muốn')
       })
   }
 

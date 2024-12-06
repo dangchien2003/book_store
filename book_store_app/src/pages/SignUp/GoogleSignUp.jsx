@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { getCodeVerifierToLocalStorage, setCodeVerifierToLocalStorage } from '@/services/localStorageService'
 import { clientId, googleAuthUrl, redirectUriForSignUp } from '@/configs/googleAuthConfig'
 import { registerByGoogle } from '@/services/userService'
-import { toastError, toastSuccess } from '@/utils/toast'
-import { messageError } from '@/configs/messageError'
+import { toastSuccess } from '@/utils/toast'
 
 function getAuthorizationCode() {
   const search = window.location.search
@@ -33,23 +32,23 @@ const GoogleSignUp = () => {
       const authorizationCode = getAuthorizationCode()
       const codeVerifier = getCodeVerifierToLocalStorage()
       const codeOk = validateCode(authorizationCode, codeVerifier)
-
       if (!codeOk) {
         cleanUrl()
         return
       }
 
-      try {
-        await registerByGoogle(authorizationCode, codeVerifier)
-        toastSuccess('Đăng ký thành công.\nBạn sẽ được đi tới đăng nhập sau 5 giây')
-        setTimeout(() => {
-          navigate('/auth')
-        }, 5000)
-      } catch (err) {
-        toastError(messageError[err.response.data.code] ?? err.response.data.message)
-      } finally {
-        cleanUrl()
-      }
+
+      await registerByGoogle(authorizationCode, codeVerifier)
+        .then(() => {
+          toastSuccess('Đăng ký thành công.\nBạn sẽ được đi tới đăng nhập sau 5 giây')
+          setTimeout(() => {
+            navigate('/auth')
+          }, 5000)
+        })
+        .catch(() => { })
+        .finally(() => {
+          cleanUrl()
+        })
     }
 
     authenticateUser()

@@ -28,6 +28,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -92,8 +93,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookUpdateResponse update(BookUpdateRequest request) {
-        return null;
+    public void update(BookUpdateRequest request) {
+        if (bookRepository.countExistInIds(new HashSet<>(List.of(request.getId()))) == 0)
+            throw new AppException(ErrorCode.NOTFOUND_DATA);
+
+        Book book = bookMapper.toBook(request);
+        book.setSize(request.getBookSize());
+        book.setModifiedAt(Instant.now().toEpochMilli());
+
+        if (bookRepository.updateBookDetail(book) == 0) {
+            throw new AppException(ErrorCode.UPDATE_FAIL);
+        }
+
+        TaskSchedulerConfig.PRODUCT_UPDATE.add(book.getId());
     }
 
     @Override
@@ -142,8 +154,10 @@ public class BookServiceImpl implements BookService {
             TaskSchedulerConfig.PRODUCT_UPDATE.add(detail.getId());
         }
 
+        if (detail.getOtherImage() != null) {
+            detail.setChildImages(List.of(detail.getOtherImage().split(" \\| ")));
+        }
         detail.setBookSize(Book.getBookSize(detail.getSize()));
-        detail.setChildImages(List.of(detail.getOtherImage().split(" \\| ")));
         detail.setOtherImage(null);
         return detail;
     }

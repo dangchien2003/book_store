@@ -1,6 +1,9 @@
 import QuillEditor from '@/components/Manager/QuillEditor'
+import { getAuthorById } from '@/services/productService/authorService'
+import { getPublisherBtId } from '@/services/productService/publisherService'
 import { formatCurrency } from '@/utils/format'
 import { Box, Chip, Grid, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
 
 
 const RenderTitle = ({ label }) => {
@@ -36,6 +39,29 @@ const GenStatus = ({ id }) => {
 }
 
 const Show = ({ info }) => {
+
+  const [authorName, setAuthorName] = useState('')
+  const [publisherName, setPublisherName] = useState('')
+
+  useEffect(() => {
+    if (info.authorId !== 0 && info.authorId !== null) {
+      getAuthorById(info.authorId)
+        .then(response => {
+          setAuthorName(response.data.result.name)
+        }).catch(() => {
+        })
+    }
+
+    if (info.publisherId !== 0 && info.publisherId !== null) {
+      getPublisherBtId(info.publisherId)
+        .then(response => {
+          setPublisherName(response.data.result.name)
+        }).catch(() => {
+        })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Box sx={{
       '> *': {
@@ -56,11 +82,11 @@ const Show = ({ info }) => {
       }}>
         <Grid item sm={12} lg={5} >
           <RenderTitle label='Tác giả' />
-          <RenderContent label={info.author} />
+          <RenderContent label={authorName} />
         </Grid>
         <Grid item sm={12} lg={7} >
           <RenderTitle label='Nhà xuất bản' />
-          <RenderContent label={`Nhà xuất bản ${info.publisher}`} />
+          <RenderContent label={publisherName ? `Nhà xuất bản ${publisherName}` : ''} />
         </Grid>
       </Grid>
       <Box>
@@ -73,11 +99,11 @@ const Show = ({ info }) => {
       </Box>
       <Box>
         <RenderTitle label='Kích thước' />
-        <RenderContent label={info.size.width} />
+        <RenderContent label={info.bookSize.width} />
         <Typography variant='span'>x</Typography>
-        <RenderContent label={info.size.wide} />
+        <RenderContent label={info.bookSize.wide} />
         <Typography variant='span'>x</Typography>
-        <RenderContent label={info.size.height} />
+        <RenderContent label={info.bookSize.height} />
       </Box>
       <Grid container>
         <Grid item lg={4} sm={6}>
@@ -105,7 +131,7 @@ const Show = ({ info }) => {
       </Grid>
 
       <Box>
-        <QuillEditor value={info.descripttion} readonly={true} />
+        <QuillEditor value={info.description} readonly={true} />
       </Box>
     </Box >
   )

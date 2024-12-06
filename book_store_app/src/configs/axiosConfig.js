@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { API_BASE_URL, API_IDENTITY_SERVICE } from '@/configs/apiConfig'
 import { getAccessToken, getRefeshToken, setAccessToken } from '@/services/localStorageService'
+import { toastError } from '@/utils/toast'
+import { messageError } from './messageError'
 
 let refreshing = false
 
@@ -31,7 +33,7 @@ const httpClient = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 5000
+  timeout: 60000
 })
 
 httpClient.interceptors.request.use(
@@ -68,8 +70,12 @@ httpClient.interceptors.response.use(
 
         return httpClient(originalRequest)
       } catch (refreshError) {
-        window.location.href = '/login'
+        window.location.href = '/login?message=Phiên làm việc hết hạn'
       }
+    } else {
+      const response = error.response.data
+      const message = messageError[response.code]
+      toastError(message ? message : response.message)
     }
 
     return Promise.reject(error)

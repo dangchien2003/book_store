@@ -1,7 +1,7 @@
 import { API_PRODUCT_SERVICE } from '@/configs/apiConfig'
 import httpClient from '@/configs/axiosConfig'
 
-async function getPublisherInPage(page) {
+export async function getPublisherInPage(page) {
   return await httpClient.get(API_PRODUCT_SERVICE.getAllPublisher, {
     params: {
       page
@@ -10,6 +10,10 @@ async function getPublisherInPage(page) {
 }
 
 
-export {
-  getPublisherInPage
+export async function getPublisherBtId(id) {
+  return await httpClient.get(API_PRODUCT_SERVICE.getInfoPublisher, {
+    params: {
+      id: id
+    }
+  })
 }

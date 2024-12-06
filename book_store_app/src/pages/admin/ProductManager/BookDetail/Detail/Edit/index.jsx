@@ -1,14 +1,16 @@
 import QuillEditor from '@/components/Manager/QuillEditor'
+import { getAuthorInPage } from '@/services/productService/authorService'
+import { getPublisherInPage } from '@/services/productService/publisherService'
 import { toastError, toastWarning } from '@/utils/toast'
 import { Box, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 const RenderTitle = ({ label }) => {
   return <Typography variant='span' sx={{ fontSize: '18px' }}>{label}: </Typography>
 }
 
-const RenderContent = ({ placeholder, value, onChange, type, label }) => {
+const RenderContent = ({ placeholder, value, onChange, type, label, readOnly }) => {
   return (<TextField
     id='outlined-search'
     label={label}
@@ -16,7 +18,9 @@ const RenderContent = ({ placeholder, value, onChange, type, label }) => {
     value={value}
     placeholder={placeholder}
     onChange={onChange}
-    sx={{ flex: 1, margin: '0 8px' }} />)
+    sx={{ flex: 1, margin: '0 8px' }}
+    disabled={readOnly}
+  />)
 }
 
 const RenderSelect = ({ value, data, onChange }) => {
@@ -31,33 +35,65 @@ const RenderSelect = ({ value, data, onChange }) => {
         {data?.map((item, index) => {
           return (<MenuItem key={index} value={item.id}>{item.name}</MenuItem>)
         })}
-        <MenuItem value={10}>Ten</MenuItem>
-        <MenuItem value={20}>Twenty</MenuItem>
-        <MenuItem value={30}>Thirty</MenuItem>
       </Select>
     </FormControl>
   )
 }
 
-const status = {
-  ON_SALE: {
-    label: 'Mở bán',
-    color: 'success'
+const status = [
+  {
+    name: 'Mở bán',
+    id: 'ON_SALE'
   },
-  OUT_OF_SALE: {
-    label: 'Dừng bán',
-    color: 'error'
+  {
+    name: 'Dừng bán',
+    id: 'OUT_OF_SALE'
   },
-  HIDE: {
-    label: 'Ẩn khỏi gian hàng',
-    color: 'warning'
+  {
+    name: 'Ẩn khỏi gian hàng',
+    id: 'HIDE'
   }
-}
-
-const Edit = ({ data }) => {
-  const { info, setInfo } = data
-  const [dataEdit, setDataEdit] = useState(info)
+]
+// let toastWarningEditQuantity = false
+const Edit = ({ onEdited, data }) => {
+  const { dataEdit, setDataEdit } = data
   const [loadingData, setLoadingData] = useState(true)
+  const [authors, setAuthors] = useState([])
+  const [publishers, setPublishers] = useState([])
+  const [authorPage, setAuthorPage] = useState(1)
+  const [publisherPage, setPublisherPage] = useState(1)
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getAuthorInPage(authorPage)
+        .then(response => {
+          if (response.data.result.length === 0) {
+            return
+          }
+          setAuthors(authors.concat(response.data.result))
+          setAuthorPage(currentPage => currentPage + 1)
+        }).catch(() => {
+        })
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [authorPage, authors])
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      getPublisherInPage(publisherPage)
+        .then(response => {
+          if (response.data.result.length === 0) {
+            return
+          }
+          setPublishers(authors.concat(response.data.result))
+          setPublisherPage(currentPage => currentPage + 1)
+        }).catch(() => {
+        })
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [publisherPage, authors])
+
+
   setTimeout(() => {
     setLoadingData(false)
   }, 1000)
@@ -65,10 +101,10 @@ const Edit = ({ data }) => {
   const quillOnChange = (value) => {
     setDataEdit((pre) => ({
       ...pre,
-      descripttion: value
+      description: value
     }))
+    onEdited(true)
   }
-
 
   const handleOnChangeDataEdit = (field, value) => {
     if (loadingData) {
@@ -91,6 +127,8 @@ const Edit = ({ data }) => {
 
       return newData
     })
+
+    onEdited(true)
   }
 
 
@@ -132,12 +170,19 @@ const Edit = ({ data }) => {
     handleOnChangeDataEdit('discount', parseInt(value))
   }
 
-  const handleChangeQuantity = () => {
-    toastWarning('Không thể chỉnh sửa tại đây')
-  }
+  // const handleChangeQuantity = () => {
+  //   if (toastWarningEditQuantity) {
+  //     return
+  //   }
+  //   toastWarningEditQuantity = true
+  //   toastWarning('Không thể chỉnh sửa tại đây')
+  //   setTimeout(() => {
+  //     toastWarningEditQuantity = false
+  //   }, 1000)
+  // }
 
   const handleChangeSize = (e, method) => {
-    let field = 'size.'
+    let field = 'bookSize.'
     if (method === 'width') {
       field += 'width'
     } else if (method === 'height') {
@@ -150,6 +195,7 @@ const Edit = ({ data }) => {
 
     handleOnChangeDataEdit(field, e.target.value)
   }
+
   return (
     <Box sx={{
       '> *': {
@@ -170,22 +216,11 @@ const Edit = ({ data }) => {
       }}>
         <Grid item sm={12} lg={5} display='flex'>
           <RenderTitle label='Tác giả' />
-          <FormControl sx={{ flex: 1, margin: '0 8px' }}>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={dataEdit.authorId}
-              onChange={handleChangeAuthor}
-            >
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
+          <RenderSelect value={dataEdit.authorId} onChange={handleChangeAuthor} data={authors} />
         </Grid>
         <Grid item sm={12} lg={7}>
           <RenderTitle label='Nhà xuất bản' />
-          <RenderSelect value={dataEdit.publisherId} onChange={handleChangePublisher} />
+          <RenderSelect value={dataEdit.publisherId} onChange={handleChangePublisher} data={publishers} />
         </Grid>
       </Grid>
       <Box>
@@ -194,7 +229,7 @@ const Edit = ({ data }) => {
       </Box>
       <Box>
         <RenderTitle label='Số lượng' />
-        <RenderContent value={dataEdit.availableQuantity} onChange={handleChangeQuantity} />
+        <RenderContent value={dataEdit.availableQuantity} readOnly />
       </Box>
       <Box>
         <Box sx={{ paddingBottom: '8px' }}>
@@ -206,15 +241,15 @@ const Edit = ({ data }) => {
           }
         }}>
           <Grid item lg={4} md={12}>
-            <RenderContent value={dataEdit.size.width} type='number' onChange={(e) => { handleChangeSize(e, 'width') }} label='Chiều dài' />
+            <RenderContent value={dataEdit.bookSize.width} type='number' onChange={(e) => { handleChangeSize(e, 'width') }} label='Chiều dài' />
           </Grid>
           <Grid item lg={4} md={12}>
             <Typography variant='span'>x</Typography>
-            <RenderContent value={dataEdit.size.wide} type='number' onChange={(e) => { handleChangeSize(e, 'wide') }} label='Chiều rộng' />
+            <RenderContent value={dataEdit.bookSize.wide} type='number' onChange={(e) => { handleChangeSize(e, 'wide') }} label='Chiều rộng' />
           </Grid>
           <Grid item lg={4} md={12}>
             <Typography variant='span'>x</Typography>
-            <RenderContent value={dataEdit.size.height} type='number' onChange={(e) => { handleChangeSize(e, 'height') }} label='Chiều cao' />
+            <RenderContent value={dataEdit.bookSize.height} type='number' onChange={(e) => { handleChangeSize(e, 'height') }} label='Chiều cao' />
           </Grid >
         </Grid>
       </Box>
@@ -225,7 +260,7 @@ const Edit = ({ data }) => {
         </Grid>
         <Grid item lg={6} sm={6}>
           <RenderTitle label='Trạng thái' />
-          <RenderSelect value={dataEdit.statusCode} data={[]} onChange={handleChangeStatus} />
+          <RenderSelect value={dataEdit.statusCode} data={status} onChange={handleChangeStatus} />
         </Grid>
       </Grid>
 
@@ -241,7 +276,7 @@ const Edit = ({ data }) => {
       </Grid>
 
       <Box>
-        <QuillEditor value={dataEdit.descripttion} readonly={false} onChange={quillOnChange} />
+        <QuillEditor value={dataEdit.description} readonly={false} onChange={quillOnChange} />
       </Box>
     </Box >
   )

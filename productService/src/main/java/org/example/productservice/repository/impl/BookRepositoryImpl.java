@@ -138,7 +138,7 @@ public class BookRepositoryImpl implements BookRepository {
     public ManagerBookDetailResponse getDetail(long bookId) throws Exception {
         String sql = """
                 SELECT b.id, b.name, b.main_image, b.price, b.discount, b.author_id, b.publisher_id, b.reprint_edition,
-                b.other_image, b.status_code, b.available_quantity, b.page_count, b.size
+                b.other_image, b.status_code, b.available_quantity, b.page_count, b.size, b.description
                 FROM book b
                 WHERE b.id = ?
                 """;
@@ -234,5 +234,24 @@ public class BookRepositoryImpl implements BookRepository {
     public List<Book> findAll() throws Exception {
         String sql = "SELECT * from book";
         return MapperUtils.mappingManyElement(Book.class, jdbcTemplate.queryForList(sql));
+    }
+
+    @Override
+    public int updateBookDetail(Book book) {
+
+        Object[] param = new Object[]{
+                book.getName(), book.getReprintEdition(), book.getPrice(),
+                book.getDiscount(), book.getPublisherId(), book.getAuthorId(),
+                book.getPageCount(), book.getSize(), book.getAvailableQuantity(),
+                book.getDescription(), book.getStatusCode(), book.getModifiedAt(),
+                book.getId()};
+
+        String sql = """
+                UPDATE book set name = ?, reprint_edition = ?, price = ?, discount = ?, publisher_id = ?,
+                 author_id = ?, page_count = ?, size = ?, available_quantity = ?, description = ?, status_code = ?, modified_at = ?
+                 WHERE id = ?
+                """;
+
+        return jdbcTemplate.update(sql, param);
     }
 }

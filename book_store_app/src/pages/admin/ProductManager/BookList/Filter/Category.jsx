@@ -1,6 +1,5 @@
 import { incrementByFilter } from '@/features/manager/filterBook/filterBookSlice'
 import { getCategoryInPage } from '@/services/productService/categoryService'
-import { toastError } from '@/utils/toast'
 import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -21,7 +20,6 @@ const Category = () => {
           setPage(currentPage => currentPage + 1)
         })
         .catch(() => {
-          toastError('Có lỗi xảy ra')
         })
     }, 1500)
     return () => clearTimeout(timeoutId)

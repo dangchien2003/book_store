@@ -12,5 +12,9 @@ export async function registerByGoogle(authorizationCode, codeVerifier) {
   return await httpClient.post(API_IDENTITY_SERVICE.registerGoogle, {
     authorizationCode,
     codeVerifier
+  }, {
+    headers: {
+      Authorization: undefined
+    }
   })
 }

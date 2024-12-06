@@ -11,7 +11,7 @@ const modules = {
         { list: 'ordered' },
         { list: 'bullet' },
         { indent: '-1' },
-        { indent: '+1' },
+        { indent: '+1' }
       ],
       ['link', 'image', 'video'],
       ['code-block'],
@@ -40,13 +40,13 @@ const formats = [
   'video',
   'code-block'
 ]
-const QuillEditor = ({ onchange, value, readonly }) => {
+const QuillEditor = ({ onChange, value, readonly }) => {
   return (
     <ReactQuill theme='snow' value={value}
       modules={modules}
       formats={formats}
       style={{ height: '400px', paddingBottom: '20px' }}
-      onChange={onchange}
+      onChange={onChange}
       readOnly={readonly}
     />
   )

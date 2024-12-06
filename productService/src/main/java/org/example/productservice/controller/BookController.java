@@ -1,9 +1,11 @@
 package org.example.productservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.productservice.dto.request.BookCreationRequest;
+import org.example.productservice.dto.request.BookUpdateRequest;
 import org.example.productservice.dto.response.ApiResponse;
 import org.example.productservice.dto.response.BookCreationResponse;
 import org.example.productservice.dto.response.ManagerBookDetailResponse;
@@ -47,5 +49,11 @@ public class BookController {
         return ApiResponse.<ManagerBookDetailResponse>builder()
                 .result(bookService.mGetDetail(bookId))
                 .build();
+    }
+
+    @PatchMapping("/update")
+    ApiResponse<Void> update(@Valid @RequestBody BookUpdateRequest request) {
+        bookService.update(request);
+        return ApiResponse.<Void>builder().build();
     }
 }

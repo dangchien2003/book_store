@@ -8,7 +8,6 @@ import { register } from '@/services/userService'
 import { ToastContainer } from 'react-toastify'
 import { toastError, toastSuccess } from '@/utils/toast'
 import VerifyMessage from './VerifyMessage'
-import { messageError } from '@/configs/messageError'
 
 const SignUpForm = () => {
   const [username, setUsername] = useState('')
@@ -37,8 +36,7 @@ const SignUpForm = () => {
           toastSuccess('Đăng ký thành công')
           setUsername(response.data.result.email)
           setRegisterSuccess(true)
-        }).catch((error) => {
-          toastError(messageError[error.response.data.code] ?? error.response.data.message)
+        }).catch(() => {
         })
     }
   }

@@ -3,15 +3,17 @@ package org.example.productservice.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.example.productservice.dto.request.BookSize;
 
 import java.util.List;
 
-@Builder
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ManagerBookDetailResponse extends BaseBookResponse {
     int authorId;
@@ -23,6 +25,7 @@ public class ManagerBookDetailResponse extends BaseBookResponse {
     int availableQuantity;
     int pageCount;
     String size;
+    String description;
     BookSize bookSize;
 }
 

@@ -1,5 +1,4 @@
 import { getAuthorInPage } from '@/services/productService/authorService'
-import { toastError } from '@/utils/toast'
 import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -19,9 +18,7 @@ const Author = () => {
           }
           setAuthor(authors.concat(response.data.result))
           setPage(currentPage => currentPage + 1)
-        })
-        .catch(() => {
-          toastError('Có lỗi xảy ra')
+        }).catch(() => {
         })
     }, 1500)
     return () => clearTimeout(timeoutId)

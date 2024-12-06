@@ -1,5 +1,4 @@
 import { getPublisherInPage } from '@/services/productService/publisherService'
-import { toastError } from '@/utils/toast'
 import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -21,7 +20,6 @@ const Publisher = () => {
           setPage(currentPage => currentPage + 1)
         })
         .catch(() => {
-          toastError('Có lỗi xảy ra')
         })
     }, 1500)
     return () => clearTimeout(timeoutId)

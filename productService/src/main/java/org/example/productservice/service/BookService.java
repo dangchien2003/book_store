@@ -11,7 +11,7 @@ import java.util.List;
 public interface BookService {
     BookCreationResponse create(BookCreationRequest request);
 
-    BookUpdateResponse update(BookUpdateRequest request);
+    void update(BookUpdateRequest request);
 
     List<ManagerFindBookResponse> find(String name, Integer category, Integer publisher, Long author, int numberPage);
 

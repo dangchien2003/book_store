@@ -1,6 +1,7 @@
 package org.example.productservice.mapper;
 
 import org.example.productservice.dto.request.BookCreationRequest;
+import org.example.productservice.dto.request.BookUpdateRequest;
 import org.example.productservice.dto.response.DetailInternal;
 import org.example.productservice.dto.response.ManagerBookDetailResponse;
 import org.example.productservice.dto.response.QuantityBookAfterMinusResponse;
@@ -13,6 +14,8 @@ public interface BookMapper {
     @Mapping(target = "size", ignore = true)
     @Mapping(target = "statusCode", ignore = true)
     Book toBook(BookCreationRequest request);
+
+    Book toBook(BookUpdateRequest request);
 
     @Mapping(target = "bookId", source = "id")
     QuantityBookAfterMinusResponse toQuantityBookAfterMinusResponse(DetailInternal detailInternal);

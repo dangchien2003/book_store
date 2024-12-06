@@ -12,8 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
 
 @Configuration
 @EnableScheduling
@@ -25,18 +29,20 @@ public class TaskSchedulerConfig {
     BookRepository bookRepository;
     ExecutorService executorService;
     RedisService redisService;
+    public static final LinkedBlockingDeque<Long> PRODUCT_UPDATE = new LinkedBlockingDeque<>();
 
-    public static final Set<Long> PRODUCT_UPDATE = Collections.synchronizedSet(new LinkedHashSet<>());
+    @Scheduled(fixedDelay = 500)
+    public void taskUpdateProductAlwaysRunning() {
 
-    @Scheduled(cron = "* */5 * * * *")
-    public void taskUpdateProduct() {
+        List<Long> productIds = new ArrayList<>();
 
-        if (PRODUCT_UPDATE.isEmpty()) {
-            return;
+        for (int i = 0; i < 100; i++) {
+            productIds.add(PRODUCT_UPDATE.poll());
         }
 
-        List<Long> productIds = new ArrayList<>(PRODUCT_UPDATE).subList(0, PRODUCT_UPDATE.size());
-        PRODUCT_UPDATE.removeAll(productIds);
+        if (productIds.isEmpty()) {
+            return;
+        }
 
         List<Book> books = null;
         try {
@@ -49,64 +55,18 @@ public class TaskSchedulerConfig {
             return;
         }
 
-        final Queue<Book> queuePutRelated = new ConcurrentLinkedQueue<>(books);
-        final Queue<Book> queuePutProduct = new ConcurrentLinkedQueue<>(books);
-        executorService.submit(() -> putRelated(queuePutRelated));
-        executorService.submit(() -> putProduct(queuePutProduct));
+        final List<Book> booksCache = books;
+        executorService.submit(() -> putRelated(booksCache));
+        executorService.submit(() -> putProduct(booksCache));
     }
 
-    void putRelated(Queue<Book> queue) {
-        
+    void putRelated(List<Book> books) {
+
     }
 
-    void putProduct(Queue<Book> queue) {
-        List<Future<Boolean>> futures = new ArrayList<>();
-        for (int i = 0; i < queue.size(); i++) {
-            Callable<Boolean> callable = () -> {
-                Book book = queue.poll();
-                if (book == null) {
-                    return true;
-                }
-
-                String key = PrefixCache.BOOK_.name() + book.getId();
-
-                redisService.delete(key);
-                redisService.save(key, book);
-
-                boolean saveOk = redisService.hasKey(key);
-                if (!saveOk) {
-                    PRODUCT_UPDATE.add(book.getId());
-                }
-
-                return saveOk;
-            };
-            Future<Boolean> future = executorService.submit(callable);
-            futures.add(future);
-        }
-
-        boolean putAllSuccess = runResult(futures);
-
-        if (putAllSuccess) {
-            log.info("Cache sản phẩm thành công");
-        } else {
-            log.warn("Cache sản phẩm thất bại");
-        }
-    }
-
-    boolean runResult(List<Future<Boolean>> futures) {
-        boolean putAllSuccess = true;
-        for (Future<Boolean> future : futures) {
-            try {
-                if (!Boolean.TRUE.equals(future.get(5, TimeUnit.SECONDS))) {
-                    putAllSuccess = false;
-                }
-            } catch (InterruptedException | TimeoutException | ExecutionException e) {
-                putAllSuccess = false;
-                log.error("Lỗi khi xử lý task: ", e);
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        return putAllSuccess;
+    void putProduct(List<Book> books) {
+        Map<String, Object> map = new HashMap<>();
+        books.forEach(book -> map.put(PrefixCache.BOOK_.name() + book.getId(), book));
+        redisService.savePipeline(map);
     }
 }

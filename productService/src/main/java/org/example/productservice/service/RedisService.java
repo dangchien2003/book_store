@@ -22,4 +22,6 @@ public interface RedisService {
     long delete(List<String> key);
 
     boolean hasKey(String key);
+
+    void savePipeline(Map<String, Object> data);
 }

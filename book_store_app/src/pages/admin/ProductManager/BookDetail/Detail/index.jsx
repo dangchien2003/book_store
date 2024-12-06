@@ -1,36 +1,50 @@
-import { Delete, Edit as EditIcon, Save } from '@mui/icons-material'
+import { Cancel, Edit as EditIcon, Save } from '@mui/icons-material'
 import { Box, Button } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Show from './Show'
 import Edit from './Edit'
+import { useParams } from 'react-router-dom'
+import { getBookDetail, updateBookDetail } from '@/services/productService/bookService'
+import { toastSuccess, toastWarning } from '@/utils/toast'
 
-const infoFake = {
-  name: 'Sách dạy code c Sách dạy code c',
-  author: 'Lê Đăng Chiến',
-  authorId: 30,
-  publisher: 'Kim Đồng',
-  publisherId: 10,
-  reprintEdition: 1,
-  availableQuantity: 20,
-  size: {
-    width: 120,
-    height: 20,
-    wide: 60
-  },
-  pageCount: 200,
-  statusCode: 'ON_SALE',
-  price: 200000,
-  discount: 10,
-  descripttion: '<h1>CHiến</h1>'
-}
 
 const Detail = () => {
-
+  const { id } = useParams()
   const [editing, setEditing] = useState(false)
-  const [info, setInfo] = useState(infoFake)
+  const [info, setInfo] = useState(null)
+  const [dataEdit, setDataEdit] = useState(null)
+  const [hasEdit, setHasEdit] = useState(false)
+
+  useEffect(() => {
+    getBookDetail(id)
+      .then(response => {
+        setInfo(response.data.result)
+      }).catch(() => {
+      })
+  }, [id])
 
   const handleToggleEdit = () => {
-    setEditing(pre => !pre)
+    const openEdit = !editing
+    setEditing(openEdit)
+    if (openEdit) {
+      setDataEdit(info)
+    } else {
+      setDataEdit(null)
+    }
+    setHasEdit(false)
+  }
+
+  const handleClickSaveData = () => {
+    if (!hasEdit) {
+      toastWarning('Thông tin chưa được thay đổi')
+      return
+    }
+
+    updateBookDetail(dataEdit).then(() => {
+      setInfo(dataEdit)
+      setHasEdit(false)
+      toastSuccess('Cập nhật thành công')
+    }).catch(() => { })
   }
 
   return (
@@ -48,15 +62,16 @@ const Detail = () => {
             Chỉnh sửa
           </Button>)
           : (<>
-            <Button variant="contained" sx={{ background: '#70f03e' }} endIcon={<Save />}>
+            <Button variant="contained" sx={{ background: '#70f03e' }} endIcon={<Save />} onClick={handleClickSaveData}>
               Lưu
             </Button>
-            <Button variant="contained" sx={{ background: '#eb4d38' }} endIcon={<Delete />} onClick={handleToggleEdit}>
-              Huỷ
+            <Button variant="contained" sx={{ background: '#eb4d38' }} endIcon={<Cancel />} onClick={handleToggleEdit}>
+              Đóng
             </Button>
           </>)}
       </Box>
-      {!editing ? <Show info={info} /> : <Edit data={{ info, setInfo }} />}
+      {(!editing && info !== null) && <Show info={info} />}
+      {editing && <Edit data={{ dataEdit, setDataEdit }} onEdited={setHasEdit} />}
     </Box>
   )
 }
