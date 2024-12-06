@@ -1,29 +1,18 @@
+import { getAllCategory } from '@/features/category/categorySlice'
 import { incrementByFilter } from '@/features/manager/filterBook/filterBookSlice'
-import { getCategoryInPage } from '@/services/productService/categoryService'
 import { Autocomplete, TextField } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const Category = () => {
-  const [categorys, setCategorys] = useState([])
-  const [page, setPage] = useState(1)
   const dispatch = useDispatch()
+  const { categorys, done } = useSelector((state) => state.category)
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      getCategoryInPage(page)
-        .then(response => {
-          if (response.data.result.length === 0) {
-            return
-          }
-          setCategorys(categorys.concat(response.data.result))
-          setPage(currentPage => currentPage + 1)
-        })
-        .catch(() => {
-        })
-    }, 1500)
-    return () => clearTimeout(timeoutId)
-  }, [page, categorys])
+    if (!done) {
+      dispatch(getAllCategory())
+    }
+  }, [done, dispatch])
 
   const handleChangeValue = (event, newValue) => {
     const value = newValue ? newValue.id : null

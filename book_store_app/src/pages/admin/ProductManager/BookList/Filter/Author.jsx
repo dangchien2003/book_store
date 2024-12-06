@@ -1,28 +1,18 @@
-import { getAuthorInPage } from '@/services/productService/authorService'
 import { Autocomplete, TextField } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { incrementByFilter } from '@/features/manager/filterBook/filterBookSlice'
+import { getAllAuthor } from '@/features/author/authorSlice'
+
 
 const Author = () => {
   const dispatch = useDispatch()
-  const [authors, setAuthor] = useState([])
-  const [page, setPage] = useState(1)
-
+  const { authors, done } = useSelector((state) => state.author)
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      getAuthorInPage(page)
-        .then(response => {
-          if (response.data.result.length === 0) {
-            return
-          }
-          setAuthor(authors.concat(response.data.result))
-          setPage(currentPage => currentPage + 1)
-        }).catch(() => {
-        })
-    }, 1500)
-    return () => clearTimeout(timeoutId)
-  }, [page, authors])
+    if (!done) {
+      dispatch(getAllAuthor())
+    }
+  }, [done, dispatch])
 
   const handleChangeValue = (event, newValue) => {
     const value = newValue ? newValue.id : null

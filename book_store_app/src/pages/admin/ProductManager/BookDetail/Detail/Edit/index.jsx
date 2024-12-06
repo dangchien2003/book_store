@@ -1,9 +1,10 @@
 import QuillEditor from '@/components/Manager/QuillEditor'
-import { getAuthorInPage } from '@/services/productService/authorService'
-import { getPublisherInPage } from '@/services/productService/publisherService'
+import { getAllAuthor } from '@/features/author/authorSlice'
+import { getAllPublisher } from '@/features/publisher/publisherSlice'
 import { toastError, toastWarning } from '@/utils/toast'
 import { Box, FormControl, Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 
 const RenderTitle = ({ label }) => {
@@ -58,41 +59,21 @@ const status = [
 const Edit = ({ onEdited, data }) => {
   const { dataEdit, setDataEdit } = data
   const [loadingData, setLoadingData] = useState(true)
-  const [authors, setAuthors] = useState([])
-  const [publishers, setPublishers] = useState([])
-  const [authorPage, setAuthorPage] = useState(1)
-  const [publisherPage, setPublisherPage] = useState(1)
+  const { authors, done: authorsDone } = useSelector((state) => state.author)
+  const { publishers, done: publishersDone } = useSelector((state) => state.author)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      getAuthorInPage(authorPage)
-        .then(response => {
-          if (response.data.result.length === 0) {
-            return
-          }
-          setAuthors(authors.concat(response.data.result))
-          setAuthorPage(currentPage => currentPage + 1)
-        }).catch(() => {
-        })
-    }, 500)
-    return () => clearTimeout(timeoutId)
-  }, [authorPage, authors])
+    if (!authorsDone) {
+      dispatch(getAllAuthor())
+    }
+  }, [authorsDone, dispatch])
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      getPublisherInPage(publisherPage)
-        .then(response => {
-          if (response.data.result.length === 0) {
-            return
-          }
-          setPublishers(authors.concat(response.data.result))
-          setPublisherPage(currentPage => currentPage + 1)
-        }).catch(() => {
-        })
-    }, 500)
-    return () => clearTimeout(timeoutId)
-  }, [publisherPage, authors])
-
+    if (!publishersDone) {
+      dispatch(getAllPublisher())
+    }
+  }, [publishersDone, dispatch])
 
   setTimeout(() => {
     setLoadingData(false)
@@ -170,17 +151,6 @@ const Edit = ({ onEdited, data }) => {
     handleOnChangeDataEdit('discount', parseInt(value))
   }
 
-  // const handleChangeQuantity = () => {
-  //   if (toastWarningEditQuantity) {
-  //     return
-  //   }
-  //   toastWarningEditQuantity = true
-  //   toastWarning('Không thể chỉnh sửa tại đây')
-  //   setTimeout(() => {
-  //     toastWarningEditQuantity = false
-  //   }, 1000)
-  // }
-
   const handleChangeSize = (e, method) => {
     let field = 'bookSize.'
     if (method === 'width') {
@@ -198,8 +168,8 @@ const Edit = ({ onEdited, data }) => {
 
   return (
     <Box sx={{
-      '> *': {
-        marginBottom: 5
+      ' > * > *': {
+        marginBottom: '20px'
       }
     }}>
       <Box display='flex'>
@@ -237,17 +207,21 @@ const Edit = ({ onEdited, data }) => {
         </Box>
         <Grid container sx={{
           ' > *': {
-            margin: '8px 0'
+            marginBottom: {
+              xs: '20px',
+              md: '20px',
+              lg: 'auto'
+            }
           }
         }}>
-          <Grid item lg={4} md={12}>
+          <Grid item lg={4} md={12} xs={12}>
             <RenderContent value={dataEdit.bookSize.width} type='number' onChange={(e) => { handleChangeSize(e, 'width') }} label='Chiều dài' />
           </Grid>
-          <Grid item lg={4} md={12}>
+          <Grid item lg={4} md={12} xs={12}>
             <Typography variant='span'>x</Typography>
             <RenderContent value={dataEdit.bookSize.wide} type='number' onChange={(e) => { handleChangeSize(e, 'wide') }} label='Chiều rộng' />
           </Grid>
-          <Grid item lg={4} md={12}>
+          <Grid item lg={4} md={12} xs={12}>
             <Typography variant='span'>x</Typography>
             <RenderContent value={dataEdit.bookSize.height} type='number' onChange={(e) => { handleChangeSize(e, 'height') }} label='Chiều cao' />
           </Grid >

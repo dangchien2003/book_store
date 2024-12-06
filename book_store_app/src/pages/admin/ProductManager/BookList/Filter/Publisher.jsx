@@ -1,30 +1,18 @@
-import { getPublisherInPage } from '@/services/productService/publisherService'
 import { Autocomplete, TextField } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { incrementByFilter } from '@/features/manager/filterBook/filterBookSlice'
+import { getAllPublisher } from '@/features/publisher/publisherSlice'
 
 const Publisher = () => {
-  const [publishers, setPublishers] = useState([])
-  const [page, setPage] = useState(1)
+  const { publishers, done } = useSelector((state) => state.publisher)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      getPublisherInPage(page)
-        .then(response => {
-          if (response.data.result.length === 0) {
-            return
-          }
-          setPublishers(publishers.concat(response.data.result))
-          setPage(currentPage => currentPage + 1)
-        })
-        .catch(() => {
-        })
-    }, 1500)
-    return () => clearTimeout(timeoutId)
-  }, [page, publishers])
-
+    if (!done) {
+      dispatch(getAllPublisher())
+    }
+  }, [done, dispatch])
 
   const handleChangeValue = (event, newValue) => {
 

@@ -45,7 +45,7 @@ const Search = () => {
               }} />
           </Box>
         </Grid>
-        <Grid item lg={5} md={4} sm={4} sx={4}>
+        <Grid item lg={5} md={4} sm={4} xs={4}>
           <Button variant="outlined" onClick={handleClickFind}><SearchIcon /></Button>
         </Grid>
       </Grid>
