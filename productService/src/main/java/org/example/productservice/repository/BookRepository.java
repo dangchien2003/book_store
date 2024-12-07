@@ -29,5 +29,13 @@ public interface BookRepository {
 
     List<Book> findAll() throws Exception;
 
+    boolean updateMainImageBook(String link, long id, long modifiedAt);
+
+    boolean updateChildImageBook(String data, long id, long modifiedAt);
+
     int updateBookDetail(Book data);
+
+    ImageBook getImageBook(long id) throws Exception;
+
+    boolean removeMainImage(long id, long modifiedAt);
 }

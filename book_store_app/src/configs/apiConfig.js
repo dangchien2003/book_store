@@ -17,5 +17,7 @@ export const API_PRODUCT_SERVICE = {
   getInfoPublisher: '/product/publisher/get', //?id
   getAllBook: '/product/book/find',
   bookDetail: '/product/book/detail/', //{id}
-  updateBookDetail: '/product/book/update' //{id}
+  updateBookDetail: '/product/book/update', //{id}
+  uploadImage: '/product/book/upload/image',
+  removeImage: '/product/book/remove/image'
 }

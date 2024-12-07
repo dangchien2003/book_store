@@ -27,6 +27,47 @@ public class BookRepositoryImpl implements BookRepository {
     JdbcTemplate jdbcTemplate;
 
     @Override
+    public boolean removeMainImage(long id, long modifiedAt) {
+        String sql = """
+                UPDATE book 
+                SET main_image = null, modified_at = ?
+                WHERE id = ?   
+                """;
+        return jdbcTemplate.update(sql, modifiedAt, id) == 1;
+    }
+
+    @Override
+    public ImageBook getImageBook(long id) throws Exception {
+        String sql = """
+                SELECT main_image, other_image
+                FROM book
+                WHERE id = ?
+                """;
+
+        return MapperUtils.mappingOneElement(ImageBook.class, jdbcTemplate.queryForMap(sql, id));
+    }
+
+    @Override
+    public boolean updateMainImageBook(String link, long id, long modifiedAt) {
+        String sql = """
+                UPDATE book 
+                SET main_image = ?, modified_at = ?
+                WHERE id = ?   
+                """;
+        return jdbcTemplate.update(sql, link, modifiedAt, id) == 1;
+    }
+
+    @Override
+    public boolean updateChildImageBook(String data, long id, long modifiedAt) {
+        String sql = """
+                UPDATE book 
+                SET other_image = ?, modified_at = ?
+                WHERE id = ?   
+                """;
+        return jdbcTemplate.update(sql, data, modifiedAt, id) == 1;
+    }
+
+    @Override
     public Long create(Book book) {
         String sql = "INSERT INTO book(name, reprint_edition, price, cost_price, discount, publisher_id, " +
                 "author_id, page_count, size, available_quantity, description, status_code, created_at) " +

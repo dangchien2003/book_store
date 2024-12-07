@@ -42,7 +42,7 @@ springdoc:
     tagsSorter: alpha
 
 token:
-  time-live-access-token: 2
+  time-live-access-token: 1000
   time-live-refresh-token: 1000000
   secret-key: ${SECRET_KEY}
 

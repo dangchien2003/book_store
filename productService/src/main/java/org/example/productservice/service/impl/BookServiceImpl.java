@@ -1,15 +1,13 @@
 package org.example.productservice.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.configuration.TaskSchedulerConfig;
 import org.example.productservice.dto.FindBook;
-import org.example.productservice.dto.request.BookCreationRequest;
-import org.example.productservice.dto.request.BookMinusQuantityRequest;
-import org.example.productservice.dto.request.BookUpdateRequest;
-import org.example.productservice.dto.request.GetDetailListBookRequest;
+import org.example.productservice.dto.request.*;
 import org.example.productservice.dto.response.*;
 import org.example.productservice.entity.Book;
 import org.example.productservice.enums.BookStatus;
@@ -22,12 +20,14 @@ import org.example.productservice.repository.BookCategoryRepository;
 import org.example.productservice.repository.BookRepository;
 import org.example.productservice.repository.PublisherRepository;
 import org.example.productservice.service.BookService;
+import org.example.productservice.service.CloudinaryService;
 import org.example.productservice.service.RedisService;
 import org.example.productservice.utils.ENumUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -42,9 +42,117 @@ public class BookServiceImpl implements BookService {
     PublisherRepository publisherRepository;
     BookCategoryRepository bookCategoryRepository;
     RedisService redisService;
+    CloudinaryService cloudinaryService;
     BookMapper bookMapper;
+    ObjectMapper objectMapper;
 
     static final int PAGE_SIZE_FOR_MANAGER_FIND = 2;
+
+    @Override
+    public void removeImage(RemoveImageBookRequest request) {
+        if (request.getType() == null
+                || (!request.getType().equalsIgnoreCase("main") && !request.getType().equalsIgnoreCase("child")))
+            throw new AppException("Đối tượng không xác định");
+
+        if (bookRepository.countExistInIds(new HashSet<>(List.of(request.getBookId()))) == 0)
+            throw new AppException(ErrorCode.NOTFOUND_DATA);
+
+        ImageBook imageBook;
+        try {
+            imageBook = bookRepository.getImageBook(request.getBookId());
+        } catch (Exception e) {
+            log.error("bookRepository.getImageBook error: ", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
+        boolean updateSuccess;
+        String imageRemove;
+        if (request.getType().equalsIgnoreCase("main")) {
+            if (imageBook.getMainImage() == null) {
+                throw new AppException("Ảnh không tồn tại");
+            }
+            updateSuccess = bookRepository.removeMainImage(request.getBookId(), Instant.now().toEpochMilli());
+            imageRemove = imageBook.getMainImage();
+        } else {
+            if (request.getIndex() == null || request.getIndex() < 0) {
+                throw new AppException("Vị trí ảnh không hợp lệ");
+            }
+
+            List<String> childImages = imageBook.convertChildImage();
+            if (childImages.size() - 1 < request.getIndex()) {
+                throw new AppException("Ảnh không tồn tại");
+            }
+            imageRemove = childImages.get(request.getIndex());
+            childImages.remove((int) request.getIndex());
+            String newOtherImage = imageBook.convertChildImageToString();
+            updateSuccess = bookRepository.updateChildImageBook(
+                    newOtherImage,
+                    request.getBookId(),
+                    Instant.now().toEpochMilli());
+        }
+
+        if (!updateSuccess)
+            throw new AppException(ErrorCode.UPDATE_FAIL);
+
+        TaskSchedulerConfig.PRODUCT_UPDATE.add(request.getBookId());
+        System.out.println(imageRemove);
+
+    }
+
+    @Override
+    public BookUploadImageResponse uploadImage(BookUploadImageRequest request) {
+        long bookId;
+        try {
+            bookId = Long.parseLong(request.getBookId());
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_DATA);
+        }
+
+        if (request.getType() == null
+                || (!request.getType().equalsIgnoreCase("main") && !request.getType().equalsIgnoreCase("child")))
+            throw new AppException("Đối tượng không xác định");
+
+
+        if (bookRepository.countExistInIds(new HashSet<>(List.of(bookId))) == 0)
+            throw new AppException(ErrorCode.NOTFOUND_DATA);
+
+        CloudinaryUploadResponse uploadResponse;
+        try {
+            uploadResponse = objectMapper.convertValue(
+                    cloudinaryService.uploadFile(request.getFile(), "book_store/book")
+                    , CloudinaryUploadResponse.class);
+        } catch (IOException e) {
+            log.error("upload file error: ", e);
+            throw new AppException("Lỗi tải tệp tin");
+        }
+
+        boolean uploadSuccess;
+        if (request.getType().equalsIgnoreCase("main")) {
+            uploadSuccess = bookRepository.updateMainImageBook(uploadResponse.getSecure_url(), bookId, Instant.now().toEpochMilli());
+        } else {
+            ImageBook imageBook;
+            try {
+                imageBook = bookRepository.getImageBook(bookId);
+            } catch (Exception e) {
+                log.error("bookRepository.getImageBook error: ", e);
+                throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+            }
+
+            List<String> childImage = imageBook.convertChildImage();
+            childImage.add(uploadResponse.getSecure_url());
+            String otherImage = imageBook.convertChildImageToString();
+            uploadSuccess = bookRepository.updateChildImageBook(otherImage, bookId, Instant.now().toEpochMilli());
+        }
+
+        if (!uploadSuccess)
+            throw new AppException(ErrorCode.UPDATE_FAIL);
+
+        TaskSchedulerConfig.PRODUCT_UPDATE.add(bookId);
+
+        return BookUploadImageResponse.builder()
+                .url(uploadResponse.getSecure_url())
+                .build();
+    }
 
     @Override
     public BookCreationResponse create(BookCreationRequest request) {
@@ -155,8 +263,9 @@ public class BookServiceImpl implements BookService {
         }
 
         if (detail.getOtherImage() != null) {
-            detail.setChildImages(List.of(detail.getOtherImage().split(" \\| ")));
+            detail.setChildImages(List.of(detail.getOtherImage().split("///")));
         }
+
         detail.setBookSize(Book.getBookSize(detail.getSize()));
         detail.setOtherImage(null);
         return detail;

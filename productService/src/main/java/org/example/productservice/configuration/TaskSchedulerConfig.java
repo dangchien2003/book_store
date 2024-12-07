@@ -32,17 +32,21 @@ public class TaskSchedulerConfig {
     public static final LinkedBlockingDeque<Long> PRODUCT_UPDATE = new LinkedBlockingDeque<>();
 
     @Scheduled(fixedDelay = 500)
-    public void taskUpdateProductAlwaysRunning() {
+    public void taskUpdateProductRunningAfter500ms() {
 
         List<Long> productIds = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
-            productIds.add(PRODUCT_UPDATE.poll());
+            Long id = PRODUCT_UPDATE.poll();
+            if (id != null) {
+                productIds.add(id);
+            }
         }
 
         if (productIds.isEmpty()) {
             return;
         }
+        log.info("cache: " + productIds);
 
         List<Book> books = null;
         try {

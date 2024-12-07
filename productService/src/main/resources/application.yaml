@@ -26,6 +26,10 @@ spring:
           min-idle: 0
           max-wait: 5s
 
+cloudinary:
+  cloud_name: dis2ybh5i
+  api_key: ${CLOUDINARY_KEY}
+  api_secret: ${CLOUDINARY_SECRET}
 
 springdoc:
   api-docs:

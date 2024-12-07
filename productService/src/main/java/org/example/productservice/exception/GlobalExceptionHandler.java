@@ -34,6 +34,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Object>> handlingAppException(AppException e) {
+        if (e.getMessage() != null) {
+            return ResponseEntity
+                    .status(400)
+                    .body(ApiResponse.builder()
+                            .code(9000)
+                            .message(e.getMessage())
+                            .build());
+        }
         ErrorCode errorCode = e.getErrorCode();
         return setResponse(errorCode);
     }

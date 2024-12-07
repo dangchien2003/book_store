@@ -56,7 +56,11 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public <T> T get(String key) {
-        return (T) redisTemplate.opsForValue().get(key);
+        try {
+            return (T) redisTemplate.opsForValue().get(key);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

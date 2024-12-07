@@ -1,27 +1,16 @@
 import { Cancel, Edit as EditIcon, Save } from '@mui/icons-material'
 import { Box, Button } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Show from './Show'
 import Edit from './Edit'
-import { useParams } from 'react-router-dom'
-import { getBookDetail, updateBookDetail } from '@/services/productService/bookService'
+import { updateBookDetail } from '@/services/productService/bookService'
 import { toastSuccess, toastWarning } from '@/utils/toast'
 
 
-const Detail = () => {
-  const { id } = useParams()
+const Detail = ({ info, setInfo }) => {
   const [editing, setEditing] = useState(false)
-  const [info, setInfo] = useState(null)
   const [dataEdit, setDataEdit] = useState(null)
   const [hasEdit, setHasEdit] = useState(false)
-
-  useEffect(() => {
-    getBookDetail(id)
-      .then(response => {
-        setInfo(response.data.result)
-      }).catch(() => {
-      })
-  }, [id])
 
   const handleToggleEdit = () => {
     const openEdit = !editing

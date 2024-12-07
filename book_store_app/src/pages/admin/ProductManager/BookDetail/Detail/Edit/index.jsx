@@ -60,7 +60,7 @@ const Edit = ({ onEdited, data }) => {
   const { dataEdit, setDataEdit } = data
   const [loadingData, setLoadingData] = useState(true)
   const { authors, done: authorsDone } = useSelector((state) => state.author)
-  const { publishers, done: publishersDone } = useSelector((state) => state.author)
+  const { publishers, done: publishersDone } = useSelector((state) => state.publisher)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -168,8 +168,8 @@ const Edit = ({ onEdited, data }) => {
 
   return (
     <Box sx={{
-      ' > * > *': {
-        marginBottom: '20px'
+      ' > * > * ': {
+        marginBottom: '21px'
       }
     }}>
       <Box display='flex'>
@@ -177,7 +177,7 @@ const Edit = ({ onEdited, data }) => {
         <RenderContent value={dataEdit.name} placeholder={'Nhập tên sách'} onChange={(e) => { handleOnChangeDataEdit('name', e.target.value) }} />
       </Box>
       <Grid container sx={{
-        ' > *': {
+        ' > * ': {
           margin: {
             lg: 0,
             sm: '8px 0'
