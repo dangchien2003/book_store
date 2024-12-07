@@ -71,6 +71,7 @@ public class BookServiceImpl implements BookService {
             if (imageBook.getMainImage() == null) {
                 throw new AppException("Ảnh không tồn tại");
             }
+
             updateSuccess = bookRepository.removeMainImage(request.getBookId(), Instant.now().toEpochMilli());
             imageRemove = imageBook.getMainImage();
         } else {
@@ -82,9 +83,11 @@ public class BookServiceImpl implements BookService {
             if (childImages.size() - 1 < request.getIndex()) {
                 throw new AppException("Ảnh không tồn tại");
             }
+
             imageRemove = childImages.get(request.getIndex());
             childImages.remove((int) request.getIndex());
             String newOtherImage = imageBook.convertChildImageToString();
+
             updateSuccess = bookRepository.updateChildImageBook(
                     newOtherImage,
                     request.getBookId(),
@@ -95,8 +98,9 @@ public class BookServiceImpl implements BookService {
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
         TaskSchedulerConfig.PRODUCT_UPDATE.add(request.getBookId());
-        System.out.println(imageRemove);
-
+        if (!TaskSchedulerConfig.REMOVE_IMAGE.offer(imageRemove)) {
+            log.error("can not add remove image: " + imageRemove);
+        }
     }
 
     @Override
@@ -141,13 +145,16 @@ public class BookServiceImpl implements BookService {
             List<String> childImage = imageBook.convertChildImage();
             childImage.add(uploadResponse.getSecure_url());
             String otherImage = imageBook.convertChildImageToString();
+            
             uploadSuccess = bookRepository.updateChildImageBook(otherImage, bookId, Instant.now().toEpochMilli());
         }
 
         if (!uploadSuccess)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        TaskSchedulerConfig.PRODUCT_UPDATE.add(bookId);
+        if (!TaskSchedulerConfig.PRODUCT_UPDATE.offer(bookId)) {
+            log.error("Cannot add product to cache: " + bookId);
+        }
 
         return BookUploadImageResponse.builder()
                 .url(uploadResponse.getSecure_url())

@@ -14,13 +14,13 @@ public class CloudinaryUploadResponse {
     String format;
     String resource_type;
     String secure_url;
-//    String created_at;
+    //    String created_at;
 //    String asset_id;
 //    String version_id;
 //    String type;
 //    long version;
 //    String url;
-//    String public_id;
+    String public_id;
 //    String[] tags;
 //    String folder;
 //    String api_key;

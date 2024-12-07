@@ -128,7 +128,7 @@ const TableBook = () => {
             {rows.map((row, index) => (
               <TableRow key={index}>
                 <TableCell component="th" scope="row">
-                  <img src={row.img} alt={row.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                  <img src={row.mainImage} alt={row.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 </TableCell>
                 <TableCell sx={{ maxWidth: 200 }} onClick={() => { handleClickViewDetail(row.id) }}>{row.name}</TableCell>
                 <TableCell >{formatCurrency(row.price)}</TableCell>

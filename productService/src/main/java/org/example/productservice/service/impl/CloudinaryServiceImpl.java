@@ -26,7 +26,6 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     @SuppressWarnings("unchecked")
     public Map<String, Object> uploadFile(MultipartFile file, String folder) throws IOException {
         File tempFile = convertMultipartFileToFile(file);
-
         try {
             return cloudinary.uploader().upload(tempFile, ObjectUtils.asMap(
                     "folder", folder));
@@ -34,6 +33,17 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             if (tempFile.exists()) {
                 tempFile.delete();
             }
+        }
+    }
+
+    @Override
+    public void removeImage(String publicId, String folder) {
+        try {
+            cloudinary.uploader().destroy(publicId, ObjectUtils.asMap(
+                    "folder", folder));
+        } catch (Exception e) {
+            log.error("Failed to delete image: " + e.getMessage());
+            log.error("Delete fail: " + publicId);
         }
     }
 

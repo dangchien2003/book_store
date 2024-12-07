@@ -67,7 +67,7 @@ const UploadChildImage = ({ images, id }) => {
     <Box sx={{ display: 'flex', marginTop: '15px', flexWrap: 'wrap', gap: '5px' }}>
       {img.map((item, index) => {
         return <Box key={index} sx={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', background: 'white', marginTop: '10px' }}>
-          <img src={item} style={{ maxWidth: '80px', height: '80px', objectFit: 'contain' }} onClick={handleClickUpload} />
+          <img src={item} style={{ maxWidth: '80px', height: '80px', objectFit: 'contain' }} />
           <X sx={{ position: 'absolute', top: '-10px', right: 0, height: '20px' }} onClick={() => { handleRemoveImage(index) }} />
         </Box>
       })}
