@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.example.productservice.configuration.TaskSchedulerConfig;
 import org.example.productservice.dto.FindBook;
 import org.example.productservice.dto.request.*;
 import org.example.productservice.dto.response.*;
@@ -23,6 +22,7 @@ import org.example.productservice.service.BookService;
 import org.example.productservice.service.CloudinaryService;
 import org.example.productservice.service.RedisService;
 import org.example.productservice.utils.ENumUtils;
+import org.example.productservice.utils.ScheduleUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,9 +50,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void removeImage(RemoveImageBookRequest request) {
-        if (request.getType() == null
-                || (!request.getType().equalsIgnoreCase("main") && !request.getType().equalsIgnoreCase("child")))
-            throw new AppException("Đối tượng không xác định");
+
+        validateEditImage(request.getType());
 
         if (bookRepository.countExistInIds(new HashSet<>(List.of(request.getBookId()))) == 0)
             throw new AppException(ErrorCode.NOTFOUND_DATA);
@@ -97,10 +96,14 @@ public class BookServiceImpl implements BookService {
         if (!updateSuccess)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        TaskSchedulerConfig.PRODUCT_UPDATE.add(request.getBookId());
-        if (!TaskSchedulerConfig.REMOVE_IMAGE.offer(imageRemove)) {
-            log.error("can not add remove image: " + imageRemove);
-        }
+        ScheduleUtils.addScheduleCacheProduct(request.getBookId());
+        ScheduleUtils.addScheduleRemoveImage(imageRemove);
+    }
+
+    void validateEditImage(String type) {
+        if (type == null
+                || (!type.equalsIgnoreCase("main") && !type.equalsIgnoreCase("child")))
+            throw new AppException("Đối tượng không xác định");
     }
 
     @Override
@@ -112,10 +115,7 @@ public class BookServiceImpl implements BookService {
             throw new AppException(ErrorCode.INVALID_DATA);
         }
 
-        if (request.getType() == null
-                || (!request.getType().equalsIgnoreCase("main") && !request.getType().equalsIgnoreCase("child")))
-            throw new AppException("Đối tượng không xác định");
-
+        validateEditImage(request.getType());
 
         if (bookRepository.countExistInIds(new HashSet<>(List.of(bookId))) == 0)
             throw new AppException(ErrorCode.NOTFOUND_DATA);
@@ -130,31 +130,33 @@ public class BookServiceImpl implements BookService {
             throw new AppException("Lỗi tải tệp tin");
         }
 
+        ImageBook imageBook;
+        try {
+            imageBook = bookRepository.getImageBook(bookId);
+        } catch (Exception e) {
+            log.error("bookRepository.getImageBook error: ", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
         boolean uploadSuccess;
         if (request.getType().equalsIgnoreCase("main")) {
             uploadSuccess = bookRepository.updateMainImageBook(uploadResponse.getSecure_url(), bookId, Instant.now().toEpochMilli());
-        } else {
-            ImageBook imageBook;
-            try {
-                imageBook = bookRepository.getImageBook(bookId);
-            } catch (Exception e) {
-                log.error("bookRepository.getImageBook error: ", e);
-                throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
-            }
 
+            if (imageBook.getMainImage() != null) {
+                ScheduleUtils.addScheduleRemoveImage(imageBook.getMainImage());
+            }
+        } else {
             List<String> childImage = imageBook.convertChildImage();
             childImage.add(uploadResponse.getSecure_url());
             String otherImage = imageBook.convertChildImageToString();
-            
+
             uploadSuccess = bookRepository.updateChildImageBook(otherImage, bookId, Instant.now().toEpochMilli());
         }
 
         if (!uploadSuccess)
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        if (!TaskSchedulerConfig.PRODUCT_UPDATE.offer(bookId)) {
-            log.error("Cannot add product to cache: " + bookId);
-        }
+        ScheduleUtils.addScheduleCacheProduct(bookId);
 
         return BookUploadImageResponse.builder()
                 .url(uploadResponse.getSecure_url())
@@ -183,8 +185,7 @@ public class BookServiceImpl implements BookService {
         if (Objects.isNull(id))
             throw new AppException(ErrorCode.UPDATE_FAIL);
 
-        // add queue
-        TaskSchedulerConfig.PRODUCT_UPDATE.add(id);
+        ScheduleUtils.addScheduleCacheProduct(id);
 
         return BookCreationResponse.builder()
                 .id(id)
@@ -220,7 +221,7 @@ public class BookServiceImpl implements BookService {
             throw new AppException(ErrorCode.UPDATE_FAIL);
         }
 
-        TaskSchedulerConfig.PRODUCT_UPDATE.add(book.getId());
+        ScheduleUtils.addScheduleCacheProduct(book.getId());
     }
 
     @Override
@@ -266,7 +267,7 @@ public class BookServiceImpl implements BookService {
                 log.error("Book repository error: ", e);
                 throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
             }
-            TaskSchedulerConfig.PRODUCT_UPDATE.add(detail.getId());
+            ScheduleUtils.addScheduleCacheProduct(detail.getId());
         }
 
         if (detail.getOtherImage() != null) {
