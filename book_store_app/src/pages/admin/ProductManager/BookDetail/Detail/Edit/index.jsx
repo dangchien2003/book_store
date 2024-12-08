@@ -168,7 +168,7 @@ const Edit = ({ onEdited, data }) => {
 
   return (
     <Box sx={{
-      '& > * > * ': {
+      ' & > * > * ': {
         marginBottom: '20px'
       }
     }}>
@@ -177,7 +177,7 @@ const Edit = ({ onEdited, data }) => {
         <RenderContent value={dataEdit.name} placeholder={'Nhập tên sách'} onChange={(e) => { handleOnChangeDataEdit('name', e.target.value) }} />
       </Box>
       <Grid container sx={{
-        '& > * ': {
+        ' & > * ': {
           margin: {
             lg: 0,
             sm: '8px 0'
