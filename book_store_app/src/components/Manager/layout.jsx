@@ -14,12 +14,24 @@ const LayoutAdmin = () => {
         display: {
           lg: 'flex',
           sm: 'block'
-        }
+        },
+        position: 'relative'
       }}>
         <SidebarMenu />
         <Box sx={{
           borderLeft: '1px solid #ababab',
-          padding: '10px', pt: '20px'
+          padding: '10px',
+          pt: '20px',
+          position: {
+            lg: 'static',
+            xs: 'absolute'
+          },
+          top: 0,
+          width: '95vw',
+          marginTop: {
+            lg: 0,
+            xs: '30px'
+          }
         }} flex={1}>
           <Outlet />
         </Box>

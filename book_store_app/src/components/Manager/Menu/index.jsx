@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { List, ListItemButton, ListItemText, Collapse, Box } from '@mui/material'
-import { ExpandLess, ExpandMore } from '@mui/icons-material'
+import { List, ListItemButton, ListItemText, Collapse, Box, useMediaQuery, createTheme } from '@mui/material'
+import { ExpandLess, ExpandMore, Menu, MenuOpen } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 
-
 export default function SidebarMenu() {
+  const theme = createTheme()
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'))
+
   const [open, setOpen] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(isLg)
 
   const handleClick = (index) => {
     setOpen(open === index ? null : index)
@@ -13,43 +16,95 @@ export default function SidebarMenu() {
 
   return (
     <Box sx={{
-      minHeight: {
-        lg: '100vh',
-        xs: 'auto'
+      position: {
+        lg: 'static',
+        xs: 'sticky'
       },
+      top: 0,
+      zIndex: 9000,
       width: {
         lg: '20%',
-        xs: '100vw'
-      },
-      backgroundColor: {
-        xs: '#f0f0f0'
-      },
-      borderRadius: {
-        xs: '0 0 10px 10px'
+        xs: '70vw'
       }
     }}>
-      <List component='nav' >
-        {menuData.map((item, index) => (
-          <Box key={item.title}>
-            <ListItemButton onClick={() => handleClick(index)} sx={{ background: open === index ? '#f1f1f3' : 'transparent' }} >
-              <ListItemText primary={item.title} />
-              {open === index ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={open === index} timeout='auto' unmountOnExit sx={open === index ? { backgroundColor: 'black' } : undefined}>
-              <List component='div' disablePadding sx={{ background: open === index ? '#f6f6f7' : 'transparent' }}>
-                {item.children.map((subItem, index) => (
-                  <Link key={index} to={subItem.link} style={{ textDecoration: 'none' }}>
-                    <ListItemButton sx={{ pl: 4 }}>
-                      <ListItemText primary={subItem.text} sx={{ color: 'black' }} />
-                    </ListItemButton>
-                  </Link>
-                ))}
-              </List>
-            </Collapse>
-          </Box>
-        ))
+      {!menuOpen && <Menu
+        sx={{
+          fontSize: '35px',
+          position: 'absolute',
+          top: 0,
+          zIndex: 9999,
+          left: '5px',
+          display: {
+            lg: 'none',
+            xs: 'block'
+          }
+        }}
+        onClick={() => setMenuOpen(true)} />}
+      <Box sx={{
+        display: !menuOpen && !isLg && 'none',
+        minHeight: '100vh',
+        position: {
+          xs: 'relative'
+        },
+        backgroundColor: {
+          xs: '#f0f0f0'
+        },
+        borderRadius: {
+          xs: '0 0 10px 10px'
+        },
+        animation: 'showMenu 0.2s ease-out',
+        '@keyframes showMenu': {
+          '0%': {
+            width: '0%'
+          },
+          '100%': {
+            width: '100%'
+          }
         }
-      </List >
+      }}>
+        <Box sx={{
+          height: {
+            lg: 0,
+            xs: '30px'
+          }
+        }}>
+          {menuOpen && <MenuOpen
+            sx={{
+              fontSize: '35px',
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              display: {
+                lg: 'none',
+                xs: 'block'
+              }
+            }}
+            onClick={() => setMenuOpen(false)} />
+          }
+        </Box>
+        <List component='nav' >
+          {menuData.map((item, index) => (
+            <Box key={item.title}>
+              <ListItemButton onClick={() => handleClick(index)} sx={{ background: open === index ? '#f1f1f3' : 'transparent' }} >
+                <ListItemText primary={item.title} />
+                {open === index ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={open === index} timeout='auto' unmountOnExit sx={open === index ? { backgroundColor: 'black' } : undefined}>
+                <List component='div' disablePadding sx={{ background: open === index ? '#f6f6f7' : 'transparent' }}>
+                  {item.children.map((subItem, index) => (
+                    <Link key={index} to={subItem.link} style={{ textDecoration: 'none' }}>
+                      <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemText primary={subItem.text} sx={{ color: 'black' }} />
+                      </ListItemButton>
+                    </Link>
+                  ))}
+                </List>
+              </Collapse>
+            </Box>
+          ))
+          }
+        </List >
+      </Box >
     </Box >
   )
 }
