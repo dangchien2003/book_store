@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { List, ListItemButton, ListItemText, Collapse, Box, useMediaQuery, createTheme } from '@mui/material'
 import { ExpandLess, ExpandMore, Menu, MenuOpen } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
@@ -9,10 +9,27 @@ export default function SidebarMenu() {
 
   const [open, setOpen] = useState(null)
   const [menuOpen, setMenuOpen] = useState(isLg)
+  const [minHeight, setMinHeight] = useState(0)
 
   const handleClick = (index) => {
     setOpen(open === index ? null : index)
   }
+
+  useEffect(() => {
+    const updateHeight = () => {
+      setMinHeight(Math.max(
+        document.documentElement.scrollHeight
+      ))
+    }
+
+    updateHeight()
+
+    window.addEventListener('resize', updateHeight)
+
+    return () => {
+      window.removeEventListener('resize', updateHeight)
+    }
+  }, [])
 
   return (
     <Box sx={{
@@ -42,7 +59,7 @@ export default function SidebarMenu() {
         onClick={() => setMenuOpen(true)} />}
       <Box sx={{
         display: !menuOpen && !isLg && 'none',
-        minHeight: '100vh',
+        minHeight: minHeight + 'px',
         position: {
           xs: 'relative'
         },

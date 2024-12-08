@@ -53,7 +53,8 @@ function AvatarMenu() {
         sx={{
           '& .MuiButtonBase-root': {
             width: '150px'
-          }
+          },
+          zIndex: 9999
         }}
       >
         <MenuItem onClick={handleClose}>Tài khoản</MenuItem>

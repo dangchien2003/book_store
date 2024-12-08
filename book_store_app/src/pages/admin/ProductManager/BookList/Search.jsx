@@ -32,7 +32,7 @@ const Search = () => {
             Tìm kiếm
           </Typography>
         </Grid>
-        <Grid item lg={10} md={4} sm={4} xs={12}>
+        <Grid item lg={8} md={4} sm={4} xs={12}>
           <Box sx={{ display: 'flex' }}>
             <TextField id="outlined-basic" variant="outlined" type='text'
               placeholder='Nhập tên sách'

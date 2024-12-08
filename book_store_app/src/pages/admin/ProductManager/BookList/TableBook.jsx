@@ -112,6 +112,9 @@ const TableBook = () => {
             <TableRow sx={{
               '& .MuiTableCell-root': {
                 fontWeight: 'bold'
+              },
+              '& > * ': {
+                minWidth: '100px'
               }
             }}>
               <TableCell>Ảnh</TableCell>
@@ -157,31 +160,3 @@ const TableBook = () => {
 }
 
 export default TableBook
-
-
-// function createData(img, name, price, discount, author, status, quantity) {
-//   return { img, name, price, discount, author, status, quantity }
-// }
-
-// const rows = [
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt Frozen yoghurt Frozen yoghurt Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-//   createData('https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg', 'Frozen yoghurt', 150000, 10, 'Đăng Chiến', 'ON_SALE', 12),
-// ]

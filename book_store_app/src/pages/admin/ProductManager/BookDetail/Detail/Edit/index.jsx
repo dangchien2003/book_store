@@ -169,7 +169,7 @@ const Edit = ({ onEdited, data }) => {
   return (
     <Box sx={{
       '& > * > * ': {
-        marginBottom: '20px !important'
+        marginBottom: '20px'
       }
     }}>
       <Box display='flex'>
@@ -177,7 +177,7 @@ const Edit = ({ onEdited, data }) => {
         <RenderContent value={dataEdit.name} placeholder={'Nhập tên sách'} onChange={(e) => { handleOnChangeDataEdit('name', e.target.value) }} />
       </Box>
       <Grid container sx={{
-        ' > * ': {
+        '& > * ': {
           margin: {
             lg: 0,
             sm: '8px 0'
@@ -206,7 +206,7 @@ const Edit = ({ onEdited, data }) => {
           <RenderTitle label='Kích thước(mm)' />
         </Box>
         <Grid container sx={{
-          ' > *': {
+          ' & > * > * ': {
             marginBottom: {
               xs: '20px',
               md: '20px',

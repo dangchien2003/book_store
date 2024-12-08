@@ -19,8 +19,12 @@ const LayoutAdmin = () => {
       }}>
         <SidebarMenu />
         <Box sx={{
-          borderLeft: '1px solid #ababab',
+          borderLeft: {
+            lg: '1px solid #ababab',
+            xs: 'none'
+          },
           padding: '10px',
+          // boxSizing: 'border-box',
           pt: '20px',
           position: {
             lg: 'static',

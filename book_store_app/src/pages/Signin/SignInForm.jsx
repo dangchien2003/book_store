@@ -4,20 +4,20 @@ import { Button, Stack } from '@mui/material'
 import PasswordField from './PasswordField'
 import Remember from './Remember'
 import GoogleLogin from './GoogleLogin'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { normalAuthentication } from '@/services/authService/loginService'
 import { deleteRememberUsername, getRememberUsername, setRememberUsername } from '@/services/cookieService'
 import { setAccessToken, setRefeshToken } from '@/services/localStorageService'
 import { useNavigate } from 'react-router-dom'
-import { messageError } from '@/configs/messageError'
 import { ToastContainer } from 'react-toastify'
-import { toastError } from '@/utils/toast'
+
 
 
 const SignInForm = () => {
   const [username, setUsername] = useState(getRememberUsername())
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(!!username)
+  const [enterClicked, setEnterClicked] = useState(false)
   const navigate = useNavigate()
 
   const handleChangeUsername = (event) => {
@@ -26,9 +26,10 @@ const SignInForm = () => {
 
   const handleChangePassword = (event) => {
     setPassword(event.target.value)
+
   }
 
-  const handleClickLogin = () => {
+  const handleClickLogin = useCallback(() => {
     normalAuthentication(username, password).then((response) => {
       setAccessToken(response.data.result.accessToken, response.data.result.expire)
       setRefeshToken(response.data.result.refreshToken)
@@ -42,15 +43,40 @@ const SignInForm = () => {
         navigate('/manager')
       else
         navigate('/store/home')
-    }).catch((error) => {
-      toastError(error.response.data ? messageError[error.response.data.code] : error.response.data.message)
+    }).catch(() => {
+      // const response = error.response.data
+      // if (response.code === 1003) {
+      //   const fieldBlank = response.message.split('Field not blank: ')
+      //   console.log(field)
+      // }
+    }).finally(() => {
+      setTimeout(() => {
+        setEnterClicked(false)
+      }, 3000)
     })
-  }
+  })
 
   const handleChangeRemember = (checked) => {
     setRemember(checked)
   }
 
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (enterClicked) return
+
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        setEnterClicked(true)
+        handleClickLogin()
+      }
+    }
+
+    document.addEventListener('keypress', handleKeyPress)
+
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress)
+    }
+  }, [handleClickLogin, enterClicked])
 
   return (
     <Box pt={2} >
