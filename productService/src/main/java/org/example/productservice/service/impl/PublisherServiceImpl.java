@@ -13,6 +13,8 @@ import org.example.productservice.exception.ErrorCode;
 import org.example.productservice.mapper.PublisherMapper;
 import org.example.productservice.repository.PublisherRepository;
 import org.example.productservice.service.PublisherService;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class PublisherServiceImpl implements PublisherService {
     PublisherMapper publisherMapper;
 
     @Override
+    @CachePut(value = "publisher-detail-by-id", key = "#result.id")
     public PublisherResponse create(PublisherCreationRequest request) {
         Publisher publisher = publisherMapper.toPublisher(request);
         publisher.onCreate();
@@ -42,6 +45,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
+    @CachePut(value = "publisher-detail-by-id", key = "#result.id")
     public PublisherResponse update(PublisherUpdateRequest request) {
         if (Objects.isNull(request.getId()))
             throw new AppException(ErrorCode.NOTFOUND_ID);
@@ -59,6 +63,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
+    @Cacheable(value = "publisher-detail-by-id", key = "#id")
     public PublisherResponse get(Integer id) {
         if (Objects.isNull(id))
             throw new AppException(ErrorCode.NOTFOUND_ID);
@@ -79,12 +84,13 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
+    @Cacheable(value = "list-publisher-detail-in-page", key = "#pageNumber")
     public List<PublisherResponse> getAll(int pageNumber) {
         int pageSize = 2;
         try {
             return publisherRepository.findAllOrderByName(pageNumber, pageSize);
         } catch (Exception e) {
-            log.error("AUTHOR SERVICE ERROR:", e);
+            log.error("publisherRepository.findAllOrderByName ERROR:", e);
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
     }
@@ -95,7 +101,7 @@ public class PublisherServiceImpl implements PublisherService {
         try {
             return publisherRepository.findAllByName(name, pageNumber, pageSize);
         } catch (Exception e) {
-            log.error("AUTHOR SERVICE ERROR:", e);
+            log.error("publisherRepository.findAllByName ERROR:", e);
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
     }

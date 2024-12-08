@@ -13,6 +13,8 @@ import org.example.productservice.exception.ErrorCode;
 import org.example.productservice.mapper.AuthorMapper;
 import org.example.productservice.repository.AuthorRepository;
 import org.example.productservice.service.AuthorService;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class AuthorServiceImpl implements AuthorService {
     AuthorMapper authorMapper;
 
     @Override
+    @CachePut(value = "author-detail-by-id", key = "#result.id")
     public AuthorResponse create(AuthorCreationRequest request) {
         Author author = authorMapper.toAuthor(request);
         author.onCreate();
@@ -42,6 +45,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @CachePut(value = "author-detail-by-id", key = "#result.id")
     public AuthorResponse update(AuthorUpdateRequest request) {
         if (Objects.isNull(request.getId()))
             throw new AppException(ErrorCode.NOTFOUND_ID);
@@ -59,6 +63,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Cacheable(value = "author-detail-by-id", key = "#id")
     public AuthorResponse get(Long id) {
         if (Objects.isNull(id))
             throw new AppException(ErrorCode.NOTFOUND_ID);
@@ -79,6 +84,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Cacheable(value = "list-author-detail-in-page", key = "#pageNumber")
     public List<AuthorResponse> getAll(int pageNumber) {
         int pageSize = 10;
         try {

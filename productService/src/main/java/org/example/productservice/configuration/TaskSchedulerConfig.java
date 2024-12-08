@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableScheduling
@@ -88,6 +89,6 @@ public class TaskSchedulerConfig {
     void putProduct(List<Book> books) {
         Map<String, Object> map = new HashMap<>();
         books.forEach(book -> map.put(PrefixCache.BOOK_.name() + book.getId(), book));
-        redisService.savePipeline(map);
+        redisService.savePipeline(map, 36, TimeUnit.HOURS);
     }
 }

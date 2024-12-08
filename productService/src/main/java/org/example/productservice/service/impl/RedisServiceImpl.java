@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.example.productservice.service.RedisService;
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
@@ -33,16 +35,20 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void savePipeline(Map<String, Object> data) {
+    public void savePipeline(Map<String, Object> data, int expire, TimeUnit timeUnit) {
+        long ttlMillis = timeUnit.toMillis(expire);
         redisTemplate.executePipelined((RedisCallback<Object>) redisConnection -> {
             RedisSerializer<Object> serializer = (RedisSerializer<Object>) redisTemplate.getValueSerializer();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
 
-
                 byte[] serializedValue = serializer.serialize(value);
-                redisConnection.set(key.getBytes(), serializedValue);
+                redisConnection.set(
+                        key.getBytes(),
+                        serializedValue,
+                        Expiration.milliseconds(ttlMillis),
+                        RedisStringCommands.SetOption.UPSERT);
             }
             return null;
         });

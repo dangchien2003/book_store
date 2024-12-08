@@ -168,8 +168,8 @@ const Edit = ({ onEdited, data }) => {
 
   return (
     <Box sx={{
-      ' > * > * ': {
-        marginBottom: '21px'
+      '& > * > * ': {
+        marginBottom: '20px !important'
       }
     }}>
       <Box display='flex'>

@@ -23,5 +23,5 @@ public interface RedisService {
 
     boolean hasKey(String key);
 
-    void savePipeline(Map<String, Object> data);
+    void savePipeline(Map<String, Object> data, int expire, TimeUnit timeUnit);
 }

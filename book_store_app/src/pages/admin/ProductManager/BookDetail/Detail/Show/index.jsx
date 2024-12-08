@@ -64,10 +64,10 @@ const Show = ({ info }) => {
 
   return (
     <Box sx={{
-      ' > * > *': {
-        marginBottom: '30px'
+      '& > * > * ': {
+        marginBottom: '30px !important'
       }
-    }}>
+    }} >
       <Box>
         <Box>
           <RenderTitle label='Tên sách'></RenderTitle>
